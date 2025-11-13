@@ -68,4 +68,4 @@ Medication non-adherence is a major cause of poor treatment outcomes, especially
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/<your-username>/medadherence.git
+   git clone https://github.com/VeeCC-T/MedAdhere.git
