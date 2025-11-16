@@ -7,7 +7,7 @@
 
 ## 🎯 Mission Accomplished
 
-MedAdhere has been fully prepared for GitHub deployment with professional documentation, clean codebase, and production-ready features.
+MedAdhere has been fully prepared for GitHub deployment with professional  documentation, clean codebase, and production-ready features.
 
 ---
 
