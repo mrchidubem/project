@@ -1,0 +1,222 @@
+/**
+ * Card Component Styles
+ * Mobile-first design with wellness theme
+ */
+
+.card {
+  background: var(--neutral-0);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--neutral-200);
+  transition: all var(--transition-base) var(--ease-in-out);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Mobile-first: Optimize touch targets and spacing */
+.card {
+  /* Ensure adequate spacing for mobile */
+  margin-bottom: var(--space-4);
+}
+
+/* ============================================
+   PADDING VARIANTS
+   ============================================ */
+
+.card--padding-sm {
+  padding: var(--space-3);
+}
+
+.card--padding-sm .card__header,
+.card--padding-sm .card__footer {
+  padding: var(--space-3);
+  margin: calc(var(--space-3) * -1);
+}
+
+.card--padding-sm .card__header {
+  margin-bottom: var(--space-3);
+}
+
+.card--padding-sm .card__footer {
+  margin-top: var(--space-3);
+}
+
+.card--padding-md {
+  padding: var(--space-4);
+}
+
+.card--padding-md .card__header,
+.card--padding-md .card__footer {
+  padding: var(--space-4);
+  margin: calc(var(--space-4) * -1);
+}
+
+.card--padding-md .card__header {
+  margin-bottom: var(--space-4);
+}
+
+.card--padding-md .card__footer {
+  margin-top: var(--space-4);
+}
+
+.card--padding-lg {
+  padding: var(--space-6);
+}
+
+.card--padding-lg .card__header,
+.card--padding-lg .card__footer {
+  padding: var(--space-6);
+  margin: calc(var(--space-6) * -1);
+}
+
+.card--padding-lg .card__header {
+  margin-bottom: var(--space-6);
+}
+
+.card--padding-lg .card__footer {
+  margin-top: var(--space-6);
+}
+
+/* ============================================
+   CARD SECTIONS
+   ============================================ */
+
+.card__header {
+  border-bottom: 1px solid var(--neutral-200);
+  font-weight: var(--font-semibold);
+  color: var(--neutral-900);
+}
+
+.card__body {
+  flex: 1;
+  color: var(--neutral-700);
+}
+
+.card__footer {
+  border-top: 1px solid var(--neutral-200);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+/* Mobile optimization: Stack footer items on small screens */
+@media (max-width: 639px) {
+  .card__footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .card__footer > * {
+    width: 100%;
+  }
+}
+
+/* ============================================
+   HOVERABLE STATE
+   ============================================ */
+
+.card--hoverable:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--primary-200);
+}
+
+/* ============================================
+   CLICKABLE STATE
+   ============================================ */
+
+.card--clickable {
+  cursor: pointer;
+  text-align: left;
+  border: 1px solid var(--neutral-200);
+  background: var(--neutral-0);
+  font-family: inherit;
+  font-size: inherit;
+  /* Ensure adequate touch target on mobile */
+  min-height: 44px;
+}
+
+.card--clickable:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--primary-300);
+}
+
+.card--clickable:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+.card--clickable:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+
+/* Tablet and up: Increase padding slightly */
+@media (min-width: 768px) {
+  .card--padding-md {
+    padding: var(--space-5);
+  }
+  
+  .card--padding-lg {
+    padding: var(--space-8);
+  }
+}
+
+/* Desktop: Maximum padding */
+@media (min-width: 1024px) {
+  .card--padding-lg {
+    padding: var(--space-10);
+  }
+}
+
+/* ============================================
+   CARD VARIANTS (Optional)
+   ============================================ */
+
+.card--outlined {
+  border: 2px solid var(--neutral-300);
+  box-shadow: none;
+}
+
+.card--elevated {
+  box-shadow: var(--shadow-lg);
+}
+
+.card--flat {
+  box-shadow: none;
+  border: none;
+}
+
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+  
+  .card--hoverable:hover,
+  .card--clickable:hover {
+    transform: none;
+  }
+}
+
+/* ============================================
+   PRINT
+   ============================================ */
+
+@media print {
+  .card {
+    border: 1px solid #000;
+    box-shadow: none;
+    page-break-inside: avoid;
+  }
+}

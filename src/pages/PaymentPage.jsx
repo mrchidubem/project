@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import usageLimiter from "../utils/usageLimiter.js";
 
 const PaymentPage = () => {
   const location = useLocation();
@@ -18,8 +19,32 @@ const PaymentPage = () => {
   };
 
   const handleConfirmPayment = () => {
+    // Handle premium upgrade success
+    handlePremiumUpgradeSuccess();
     alert("✅ Payment successful! You are now a Premium user.");
     navigate("/premium");
+  };
+
+  /**
+   * Handle successful premium upgrade
+   * - Update premium status in usageLimiter
+   * - Clear usage limitations for newly premium users
+   * - Preserve existing data during status transitions
+   */
+  const handlePremiumUpgradeSuccess = () => {
+    try {
+      // Set premium status with 30-day expiry (monthly subscription)
+      const expiryDate = new Date();
+      expiryDate.setMonth(expiryDate.getMonth() + 1);
+      
+      // Update premium status - this preserves existing medication/ADR data
+      usageLimiter.setPremiumStatus(expiryDate);
+      
+      console.log("Premium upgrade successful - status updated");
+    } catch (err) {
+      console.error("Failed to update premium status:", err);
+      // Continue with navigation even if status update fails
+    }
   };
 
   const handleBack = () => {

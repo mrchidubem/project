@@ -1,0 +1,202 @@
+/**
+ * BottomNav Component Styles
+ * Mobile-first bottom navigation with wellness theme
+ * Hidden on tablet/desktop (uses Sidebar instead)
+ */
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--neutral-0);
+  border-top: 1px solid var(--neutral-200);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  z-index: var(--z-fixed);
+  /* Safe area for iOS notch */
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Hide on tablet and desktop (768px+) */
+@media (min-width: 768px) {
+  .bottom-nav {
+    display: none;
+  }
+}
+
+/* ============================================
+   CONTAINER
+   ============================================ */
+
+.bottom-nav__container {
+  display: flex;
+  justify-content: space-around;
+  align-items: stretch;
+  max-width: var(--container-lg);
+  margin: 0 auto;
+  padding: 0;
+}
+
+/* ============================================
+   NAV ITEM
+   ============================================ */
+
+.bottom-nav__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-1);
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--neutral-500);
+  transition: all var(--transition-base) var(--ease-in-out);
+  position: relative;
+  /* Mobile-first: Ensure adequate touch target */
+  min-height: 64px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bottom-nav__item:hover {
+  background: var(--neutral-50);
+}
+
+.bottom-nav__item:active {
+  background: var(--neutral-100);
+  transform: scale(0.95);
+}
+
+.bottom-nav__item:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: calc(var(--focus-ring-offset) * -1);
+  z-index: 1;
+}
+
+/* ============================================
+   ACTIVE STATE
+   ============================================ */
+
+.bottom-nav__item--active {
+  color: var(--primary-600);
+}
+
+.bottom-nav__item--active .bottom-nav__icon {
+  transform: scale(1.1);
+}
+
+/* ============================================
+   ICON
+   ============================================ */
+
+.bottom-nav__icon {
+  font-size: 1.5rem;
+  line-height: 1;
+  transition: transform var(--transition-base) var(--ease-out);
+}
+
+/* ============================================
+   LABEL
+   ============================================ */
+
+.bottom-nav__label {
+  font-size: 0.7rem;
+  font-weight: var(--font-medium);
+  line-height: 1;
+  text-align: center;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bottom-nav__item--active .bottom-nav__label {
+  font-weight: var(--font-semibold);
+}
+
+/* ============================================
+   ACTIVE INDICATOR
+   ============================================ */
+
+.bottom-nav__indicator {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 3px;
+  background: var(--primary-500);
+  border-radius: 0 0 var(--radius-full) var(--radius-full);
+  animation: slideInDown var(--transition-base) var(--ease-out);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+/* Hide on desktop - show sidebar instead */
+@media (min-width: 1024px) {
+  .bottom-nav {
+    display: none;
+  }
+}
+
+/* Tablet: Slightly larger */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .bottom-nav__item {
+    min-height: 72px;
+  }
+  
+  .bottom-nav__icon {
+    font-size: 1.75rem;
+  }
+  
+  .bottom-nav__label {
+    font-size: 0.75rem;
+  }
+}
+
+/* Very small screens: Smaller text */
+@media (max-width: 374px) {
+  .bottom-nav__label {
+    font-size: 0.65rem;
+  }
+  
+  .bottom-nav__icon {
+    font-size: 1.25rem;
+  }
+}
+
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .bottom-nav__item {
+    transition: none;
+  }
+  
+  .bottom-nav__item:active {
+    transform: none;
+  }
+  
+  .bottom-nav__item--active .bottom-nav__icon {
+    transform: none;
+  }
+  
+  .bottom-nav__indicator {
+    animation: none;
+  }
+}
+
+/* ============================================
+   PRINT
+   ============================================ */
+
+@media print {
+  .bottom-nav {
+    display: none;
+  }
+}

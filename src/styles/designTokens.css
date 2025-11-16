@@ -1,0 +1,291 @@
+/**
+ * MedAdhere Design System - Design Tokens
+ * Wellness-themed design system with professional, accessible colors
+ */
+
+:root {
+  /* ============================================
+     PRIMARY COLORS - Trust & Reliability (Ocean Blue)
+     ============================================ */
+  --primary-50: #E8F4F8;
+  --primary-100: #B8E1ED;
+  --primary-200: #88CDE2;
+  --primary-300: #58B9D7;
+  --primary-400: #3AABCC;
+  --primary-500: #2196B3;
+  --primary-600: #1E88A8;
+  --primary-700: #1A7A9D;
+  --primary-800: #176C92;
+  --primary-900: #145E87;
+
+  /* ============================================
+     SECONDARY COLORS - Health & Growth (Healthy Green)
+     ============================================ */
+  --secondary-50: #E8F5E9;
+  --secondary-100: #C8E6C9;
+  --secondary-200: #A5D6A7;
+  --secondary-300: #81C784;
+  --secondary-400: #66BB6A;
+  --secondary-500: #4CAF50;
+  --secondary-600: #43A047;
+  --secondary-700: #388E3C;
+  --secondary-800: #2E7D32;
+  --secondary-900: #1B5E20;
+
+  /* ============================================
+     ACCENT COLORS - Vitality & Energy (Warm Orange)
+     ============================================ */
+  --accent-50: #FFF3E0;
+  --accent-100: #FFE0B2;
+  --accent-200: #FFCC80;
+  --accent-300: #FFB74D;
+  --accent-400: #FFA726;
+  --accent-500: #FF9800;
+  --accent-600: #FB8C00;
+  --accent-700: #F57C00;
+  --accent-800: #EF6C00;
+  --accent-900: #E65100;
+
+  /* ============================================
+     NEUTRAL COLORS - Foundation
+     ============================================ */
+  --neutral-0: #FFFFFF;
+  --neutral-50: #FAFAFA;
+  --neutral-100: #F5F5F5;
+  --neutral-200: #EEEEEE;
+  --neutral-300: #E0E0E0;
+  --neutral-400: #BDBDBD;
+  --neutral-500: #9E9E9E;
+  --neutral-600: #757575;
+  --neutral-700: #616161;
+  --neutral-800: #424242;
+  --neutral-900: #212121;
+  --neutral-1000: #000000;
+
+  /* ============================================
+     SEMANTIC COLORS
+     ============================================ */
+  --success: #4CAF50;
+  --success-light: #E8F5E9;
+  --success-dark: #388E3C;
+
+  --warning: #FF9800;
+  --warning-light: #FFF3E0;
+  --warning-dark: #F57C00;
+
+  --error: #F44336;
+  --error-light: #FFEBEE;
+  --error-dark: #D32F2F;
+
+  --info: #2196B3;
+  --info-light: #E3F2FD;
+  --info-dark: #1976D2;
+
+  /* ============================================
+     CHART COLORS - Color-blind friendly
+     ============================================ */
+  --chart-color-1: #2196B3;
+  --chart-color-2: #4CAF50;
+  --chart-color-3: #FF9800;
+  --chart-color-4: #9C27B0;
+  --chart-color-5: #00BCD4;
+  --chart-color-6: #FFEB3B;
+  --chart-color-7: #F44336;
+  --chart-color-8: #795548;
+
+  /* ============================================
+     TYPOGRAPHY
+     ============================================ */
+  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  --font-mono: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', 'Courier New', monospace;
+
+  /* Font Sizes */
+  --text-xs: 0.75rem;      /* 12px */
+  --text-sm: 0.875rem;     /* 14px */
+  --text-base: 1rem;       /* 16px */
+  --text-lg: 1.125rem;     /* 18px */
+  --text-xl: 1.25rem;      /* 20px */
+  --text-2xl: 1.5rem;      /* 24px */
+  --text-3xl: 1.875rem;    /* 30px */
+  --text-4xl: 2.25rem;     /* 36px */
+  --text-5xl: 3rem;        /* 48px */
+
+  /* Line Heights */
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* Font Weights */
+  --font-light: 300;
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+  /* Letter Spacing */
+  --letter-spacing-tight: -0.025em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.025em;
+  --letter-spacing-wider: 0.05em;
+
+  /* ============================================
+     SPACING - 8-point grid system
+     ============================================ */
+  --space-0: 0;
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+  --space-20: 5rem;     /* 80px */
+  --space-24: 6rem;     /* 96px */
+
+  /* ============================================
+     BORDER RADIUS
+     ============================================ */
+  --radius-none: 0;
+  --radius-sm: 0.25rem;   /* 4px */
+  --radius-md: 0.5rem;    /* 8px */
+  --radius-lg: 0.75rem;   /* 12px */
+  --radius-xl: 1rem;      /* 16px */
+  --radius-2xl: 1.5rem;   /* 24px */
+  --radius-3xl: 2rem;     /* 32px */
+  --radius-full: 9999px;
+
+  /* ============================================
+     SHADOWS
+     ============================================ */
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+
+  /* Colored Shadows */
+  --shadow-primary: 0 4px 14px 0 rgba(33, 150, 179, 0.25);
+  --shadow-secondary: 0 4px 14px 0 rgba(76, 175, 80, 0.25);
+  --shadow-accent: 0 4px 14px 0 rgba(255, 152, 0, 0.25);
+
+  /* ============================================
+     BORDERS
+     ============================================ */
+  --border-width-thin: 1px;
+  --border-width-medium: 2px;
+  --border-width-thick: 4px;
+
+  --border-color-light: var(--neutral-200);
+  --border-color-medium: var(--neutral-300);
+  --border-color-dark: var(--neutral-400);
+
+  /* ============================================
+     Z-INDEX LAYERS
+     ============================================ */
+  --z-base: 0;
+  --z-dropdown: 1000;
+  --z-sticky: 1100;
+  --z-fixed: 1200;
+  --z-modal-backdrop: 1300;
+  --z-modal: 1400;
+  --z-popover: 1500;
+  --z-tooltip: 1600;
+
+  /* ============================================
+     TRANSITIONS & ANIMATIONS
+     ============================================ */
+  --transition-fast: 150ms;
+  --transition-base: 200ms;
+  --transition-slow: 300ms;
+  --transition-slower: 400ms;
+
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  /* ============================================
+     BREAKPOINTS (for reference in media queries)
+     ============================================ */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+
+  /* ============================================
+     CONTAINER WIDTHS
+     ============================================ */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1280px;
+  --container-2xl: 1536px;
+
+  /* ============================================
+     OPACITY
+     ============================================ */
+  --opacity-0: 0;
+  --opacity-10: 0.1;
+  --opacity-20: 0.2;
+  --opacity-30: 0.3;
+  --opacity-40: 0.4;
+  --opacity-50: 0.5;
+  --opacity-60: 0.6;
+  --opacity-70: 0.7;
+  --opacity-80: 0.8;
+  --opacity-90: 0.9;
+  --opacity-100: 1;
+
+  /* ============================================
+     BACKDROP BLUR
+     ============================================ */
+  --blur-none: 0;
+  --blur-sm: 4px;
+  --blur-md: 8px;
+  --blur-lg: 16px;
+  --blur-xl: 24px;
+
+  /* ============================================
+     FOCUS RING
+     ============================================ */
+  --focus-ring-width: 3px;
+  --focus-ring-color: var(--primary-500);
+  --focus-ring-offset: 2px;
+  --focus-ring: 0 0 0 var(--focus-ring-width) var(--primary-100);
+
+  /* ============================================
+     GRADIENTS
+     ============================================ */
+  --gradient-primary: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+  --gradient-secondary: linear-gradient(135deg, var(--secondary-500) 0%, var(--secondary-600) 100%);
+  --gradient-accent: linear-gradient(135deg, var(--accent-500) 0%, var(--accent-600) 100%);
+  --gradient-wellness: linear-gradient(135deg, var(--primary-400) 0%, var(--secondary-400) 100%);
+  --gradient-hero: linear-gradient(135deg, var(--primary-50) 0%, var(--secondary-50) 100%);
+}
+
+/* ============================================
+   DARK MODE SUPPORT (Optional - for future)
+   ============================================ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Dark mode colors can be added here in the future */
+  }
+}
+
+/* ============================================
+   REDUCED MOTION SUPPORT
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-fast: 0ms;
+    --transition-base: 0ms;
+    --transition-slow: 0ms;
+    --transition-slower: 0ms;
+  }
+}

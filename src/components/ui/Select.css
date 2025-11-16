@@ -1,0 +1,212 @@
+/**
+ * Select Component Styles
+ * Mobile-first design with wellness theme
+ */
+
+.select-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.select-wrapper--full-width {
+  width: 100%;
+}
+
+/* ============================================
+   LABEL
+   ============================================ */
+
+.select__label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--neutral-800);
+  display: block;
+}
+
+.select__required {
+  color: var(--error);
+  margin-left: var(--space-1);
+}
+
+/* ============================================
+   SELECT CONTAINER
+   ============================================ */
+
+.select__container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* ============================================
+   SELECT BASE STYLES
+   ============================================ */
+
+.select {
+  width: 100%;
+  font-family: var(--font-primary);
+  font-size: var(--text-base);
+  color: var(--neutral-800);
+  background: var(--neutral-0);
+  border: 2px solid var(--neutral-300);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base) var(--ease-in-out);
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  /* Mobile-first: Prevent zoom on iOS */
+  font-size: 16px;
+  /* Add padding for custom arrow */
+  padding-right: var(--space-10);
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px var(--primary-100);
+}
+
+.select:disabled {
+  background: var(--neutral-100);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ============================================
+   SIZES
+   ============================================ */
+
+.select--sm {
+  padding: var(--space-2) var(--space-3);
+  min-height: 36px;
+  font-size: 14px; /* Prevent iOS zoom */
+}
+
+.select--md {
+  padding: var(--space-3) var(--space-4);
+  min-height: 44px; /* Mobile touch target */
+  font-size: 16px; /* Prevent iOS zoom */
+}
+
+.select--lg {
+  padding: var(--space-4) var(--space-5);
+  min-height: 52px;
+  font-size: 18px;
+}
+
+/* ============================================
+   CUSTOM ARROW ICON
+   ============================================ */
+
+.select__icon {
+  position: absolute;
+  right: var(--space-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--neutral-500);
+  pointer-events: none;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.select__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.select:disabled + .select__icon {
+  opacity: 0.5;
+}
+
+/* ============================================
+   ERROR STATE
+   ============================================ */
+
+.select--error {
+  border-color: var(--error);
+}
+
+.select--error:focus {
+  border-color: var(--error);
+  box-shadow: 0 0 0 3px var(--error-light);
+}
+
+.select__error {
+  font-size: var(--text-sm);
+  color: var(--error);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.select__error::before {
+  content: '⚠';
+  font-size: var(--text-base);
+}
+
+/* ============================================
+   HELPER TEXT
+   ============================================ */
+
+.select__helper-text {
+  font-size: var(--text-sm);
+  color: var(--neutral-600);
+}
+
+/* ============================================
+   OPTION STYLES
+   ============================================ */
+
+.select option {
+  padding: var(--space-2);
+  background: var(--neutral-0);
+  color: var(--neutral-800);
+}
+
+.select option:disabled {
+  color: var(--neutral-400);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+/* Tablet and up: Allow smaller font sizes */
+@media (min-width: 768px) {
+  .select {
+    font-size: var(--text-base);
+  }
+  
+  .select--sm {
+    font-size: var(--text-sm);
+  }
+  
+  .select--lg {
+    font-size: var(--text-lg);
+  }
+}
+
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .select {
+    transition: none;
+  }
+}
+
+/* ============================================
+   PRINT
+   ============================================ */
+
+@media print {
+  .select {
+    border: 1px solid #000;
+    box-shadow: none;
+  }
+}

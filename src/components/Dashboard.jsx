@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   BarChart,
   Bar,
@@ -8,24 +10,28 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { Card, ProgressBar, Button } from "./ui";
 import UpgradeModal from "./UpgradeModal";
+import usageLimiter from "../utils/usageLimiter.js";
+import onboardingManager from "../utils/onboardingManager";
+import "./Dashboard.css";
 
 const Dashboard = () => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
   const [adherenceHistory, setAdherenceHistory] = useState({});
   const [medications, setMedications] = useState([]);
   const [adrReports, setAdrReports] = useState([]);
-  const [adrForm, setAdrForm] = useState({
-    medication: "",
-    symptom: "",
-    severity: "Mild",
-  });
-
   const [plan, setPlan] = useState("free");
   const [showUpgrade, setShowUpgrade] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [darkMode, setDarkMode] = useState(false);
   const todayKey = new Date().toLocaleDateString();
   const [todayPercent, setTodayPercent] = useState(0);
+  const [userName, setUserName] = useState("");
+
+  const handleStartTutorial = () => {
+    onboardingManager.startManualTutorial();
+    window.dispatchEvent(new CustomEvent('restartOnboarding'));
+  };
 
   // Load persisted data
   useEffect(() => {
@@ -33,15 +39,15 @@ const Dashboard = () => {
     const savedMeds = JSON.parse(localStorage.getItem("medications")) || [];
     const savedADRs = JSON.parse(localStorage.getItem("adrReports")) || [];
     const savedPlan = localStorage.getItem("plan") || "free";
-    const savedDark = JSON.parse(localStorage.getItem("darkMode")) || false;
+    const savedName = localStorage.getItem("userName") || "there";
 
     setAdherenceHistory(savedHistory);
     setMedications(savedMeds);
     setAdrReports(savedADRs);
     setPlan(savedPlan);
-    setDarkMode(savedDark);
+    setUserName(savedName);
 
-    // Compute today's adherence immediately
+    // Compute today's adherence
     if (typeof savedHistory[todayKey] !== "undefined") {
       setTodayPercent(savedHistory[todayKey]);
     } else {
@@ -50,11 +56,7 @@ const Dashboard = () => {
       const pct = allowed.length === 0 ? 0 : Math.round((takenCount / allowed.length) * 100);
       setTodayPercent(pct);
     }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("darkMode", JSON.stringify(darkMode));
-  }, [darkMode]);
+  }, [todayKey]);
 
   const syncAdherenceHistory = (percent) => {
     const newHistory = { ...adherenceHistory, [todayKey]: percent };
@@ -62,59 +64,26 @@ const Dashboard = () => {
     localStorage.setItem("adherenceHistory", JSON.stringify(newHistory));
   };
 
-  // --- ADR handlers ---
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setAdrForm({ ...adrForm, [name]: value });
-  };
-
-  const handleADRSubmit = (e) => {
-    e.preventDefault();
-    if (!adrForm.medication || !adrForm.symptom) {
-      alert("Please fill in all fields.");
-      return;
+  // Handle premium upgrade
+  const handlePremiumUpgradeSuccess = () => {
+    try {
+      const expiryDate = new Date();
+      expiryDate.setMonth(expiryDate.getMonth() + 1);
+      usageLimiter.setPremiumStatus(expiryDate);
+    } catch (err) {
+      console.error("Failed to update premium status:", err);
     }
-    if (plan === "free" && adrReports.length >= 3) {
-      alert("Upgrade to Premium to submit unlimited ADR reports.");
-      setShowUpgrade(true);
-      return;
-    }
-
-    const newADR = {
-      id: Date.now(),
-      ...adrForm,
-      date: new Date().toLocaleDateString(),
-    };
-
-    const updatedReports = [newADR, ...adrReports];
-    setAdrReports(updatedReports);
-    localStorage.setItem("adrReports", JSON.stringify(updatedReports));
-    setAdrForm({ medication: "", symptom: "", severity: "Mild" });
-    alert("✅ ADR Report submitted successfully!");
   };
 
-  const handleDeleteADR = (id) => {
-    if (!confirm("Delete this ADR report?")) return;
-    const updated = adrReports.filter((r) => r.id !== id);
-    setAdrReports(updated);
-    localStorage.setItem("adrReports", JSON.stringify(updated));
-  };
-
-  // --- Plan upgrade ---
   const handleUpgrade = () => {
+    handlePremiumUpgradeSuccess();
     localStorage.setItem("plan", "premium");
     setPlan("premium");
     setShowUpgrade(false);
-    alert("🎉 Upgrade successful! You’re now on the Premium plan.");
+    alert("🎉 Upgrade successful! You're now on the Premium plan.");
   };
 
-  // --- Adherence chart data ---
-  const weeklyTrend = Object.keys(adherenceHistory)
-    .sort((a, b) => new Date(a) - new Date(b))
-    .slice(-7)
-    .map((day) => ({ date: day, adherence: adherenceHistory[day] }));
-
-  // --- Medication quick actions ---
+  // Medication quick actions
   const markAsTaken = (id) => {
     const updated = medications.map((m) =>
       m.id === id ? { ...m, taken: true, takenAt: new Date().toLocaleTimeString() } : m
@@ -131,284 +100,264 @@ const Dashboard = () => {
     if (percent === 100) {
       if ("Notification" in window && Notification.permission === "granted") {
         new Notification("🎉 Great job!", { body: "You completed today's medications." });
-      } else {
-        alert("🎉 Great job! You completed today's medications.");
       }
     }
   };
 
-  const deleteMedication = (id) => {
-    if (!confirm("Delete this medication?")) return;
-    const updated = medications.filter((m) => m.id !== id);
-    setMedications(updated);
-    localStorage.setItem("medications", JSON.stringify(updated));
+  // Weekly trend data
+  const weeklyTrend = Object.keys(adherenceHistory)
+    .sort((a, b) => new Date(a) - new Date(b))
+    .slice(-7)
+    .map((day) => ({ date: day, adherence: adherenceHistory[day] }));
 
-    const allowed = plan === "free" ? updated.slice(0, 3) : updated;
-    const takenCount = allowed.filter((m) => m.taken).length;
-    const percent = allowed.length === 0 ? 0 : Math.round((takenCount / allowed.length) * 100);
-    setTodayPercent(percent);
-    syncAdherenceHistory(percent);
+  // Get greeting based on time
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return t('good_morning') || "Good morning";
+    if (hour < 18) return t('good_afternoon') || "Good afternoon";
+    return t('good_evening') || "Good evening";
   };
 
-  // --- ADR search filter (safe handling) ---
-  const filteredReports = adrReports.filter((r) => {
-    if (!r || !r.medication || !r.symptom) return false;
-    const med = r.medication.toString().toLowerCase();
-    const sym = r.symptom.toString().toLowerCase();
-    const query = searchQuery.toLowerCase();
-    return med.includes(query) || sym.includes(query);
-  });
-
-  // --- Styles ---
-  const bg = darkMode ? "#0b1220" : "#f8fafc";
-  const text = darkMode ? "#f8fafc" : "#0b1220";
-
-  const motivational = (p) => {
-    if (p === 100) return "🎉 Perfect — all meds taken today.";
-    if (p >= 75) return "💪 Great progress — almost there!";
-    if (p >= 40) return "👍 Keep going — consistency matters.";
-    if (p > 0) return "⏳ Take the rest to stay on track.";
-    return "📌 No meds taken yet today.";
+  // Get motivational message
+  const getMotivation = (percent) => {
+    if (percent === 100) return "🎉 Perfect — all meds taken today!";
+    if (percent >= 75) return "💪 Great progress — almost there!";
+    if (percent >= 40) return "👍 Keep going — consistency matters.";
+    if (percent > 0) return "⏳ Take the rest to stay on track.";
+    return "📌 Start your day by taking your medications.";
   };
+
+  // Get today's medications
+  const todayMeds = plan === "free" ? medications.slice(0, 3) : medications;
+  const takenToday = todayMeds.filter(m => m.taken).length;
+  const upcomingMeds = todayMeds.filter(m => !m.taken).slice(0, 3);
+
+  // Recent activity
+  const recentActivity = [
+    ...medications
+      .filter(m => m.taken && m.takenAt)
+      .map(m => ({
+        type: 'medication',
+        text: `Took ${m.name}`,
+        time: m.takenAt,
+        icon: '💊'
+      })),
+    ...adrReports.slice(0, 3).map(r => ({
+      type: 'adr',
+      text: `Reported ADR: ${r.medication}`,
+      time: r.date,
+      icon: '⚠️'
+    }))
+  ].slice(0, 5);
 
   return (
-    <div style={{ padding: 16, backgroundColor: bg, color: text, minHeight: "100vh" }}>
-      {/* Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h2>📊 My Dashboard</h2>
-        <button
-          onClick={() => setDarkMode(!darkMode)}
-          style={{
-            backgroundColor: darkMode ? "#334155" : "#e2e8f0",
-            color: darkMode ? "#f8fafc" : "#0b1220",
-            border: "none",
-            borderRadius: 6,
-            padding: "6px 10px",
-            cursor: "pointer",
-          }}
-        >
-          {darkMode ? "☀️ Light" : "🌙 Dark"}
-        </button>
+    <div className="dashboard page-enter">
+      {/* Hero Section */}
+      <div className="dashboard__hero">
+        <h1 className="dashboard__greeting">{getGreeting()}, {userName}!</h1>
+        <p className="dashboard__motivation">{getMotivation(todayPercent)}</p>
       </div>
 
-      {/* Plan */}
-      <div style={{ margin: "12px 0", maxWidth: 600 }}>
-        <p>
-          Plan:{" "}
-          <strong style={{ color: plan === "premium" ? "#22c55e" : "#f59e0b" }}>
-            {plan.toUpperCase()}
-          </strong>
-        </p>
-        {plan === "free" && (
-          <button
-            onClick={() => setShowUpgrade(true)}
-            style={{
-              backgroundColor: "#007bff",
-              color: "#fff",
-              border: "none",
-              padding: "8px 12px",
-              borderRadius: 6,
-              cursor: "pointer",
-            }}
-          >
-            Upgrade to Premium
-          </button>
-        )}
+      {/* Statistics Cards */}
+      <div className="dashboard__stats">
+        <Card className="stat-card">
+          <div className="stat-card__icon">💊</div>
+          <div className="stat-card__content">
+            <div className="stat-card__value">{medications.length}</div>
+            <div className="stat-card__label">Total Medications</div>
+          </div>
+        </Card>
+
+        <Card className="stat-card">
+          <div className="stat-card__icon">📅</div>
+          <div className="stat-card__content">
+            <div className="stat-card__value">{takenToday}/{todayMeds.length}</div>
+            <div className="stat-card__label">Today's Doses</div>
+          </div>
+        </Card>
+
+        <Card className="stat-card">
+          <div className="stat-card__icon">📊</div>
+          <div className="stat-card__content">
+            <div className="stat-card__value">{todayPercent}%</div>
+            <div className="stat-card__label">Adherence Rate</div>
+          </div>
+        </Card>
+
+        <Card className="stat-card">
+          <div className="stat-card__icon">⚠️</div>
+          <div className="stat-card__content">
+            <div className="stat-card__value">{adrReports.length}</div>
+            <div className="stat-card__label">ADR Reports</div>
+          </div>
+        </Card>
       </div>
 
-      {/* Daily Adherence */}
-      <div style={{ maxWidth: 600, background: darkMode ? "#0f172a" : "#fff", padding: 12, borderRadius: 10 }}>
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
+      {/* Progress Bar */}
+      <Card className="dashboard__progress">
+        <div className="progress-header">
           <div>
-            <strong>Today's adherence</strong>
-            <div style={{ fontSize: 12 }}>{todayKey}</div>
+            <h3 className="progress-title">Daily Progress</h3>
+            <p className="progress-date">{todayKey}</p>
           </div>
-          <div style={{ textAlign: "right" }}>
-            <div style={{ fontWeight: "600" }}>{todayPercent}%</div>
-            <div style={{ fontSize: 12 }}>{motivational(todayPercent)}</div>
-          </div>
+          <div className="progress-percent">{todayPercent}%</div>
         </div>
-        <div style={{ height: 18, background: darkMode ? "#475569" : "#e6eef6", borderRadius: 10, marginTop: 8 }}>
-          <div
-            style={{
-              height: "100%",
-              width: `${todayPercent}%`,
-              background: todayPercent === 100 ? "#16a34a" : "#2563eb",
-              borderRadius: 10,
-              transition: "width 700ms ease-in-out",
-            }}
-          />
+        <ProgressBar value={todayPercent} max={100} />
+      </Card>
+
+      {/* Quick Actions */}
+      <div className="dashboard__section">
+        <h2 className="section-title">Quick Actions</h2>
+        <div className="quick-actions">
+          <Card className="action-card" clickable onClick={() => navigate('/medications')}>
+            <div className="action-card__icon">💊</div>
+            <h3 className="action-card__title">My Medications</h3>
+            <p className="action-card__description">View and manage</p>
+          </Card>
+
+          <Card className="action-card" clickable onClick={() => navigate('/adr')}>
+            <div className="action-card__icon">⚠️</div>
+            <h3 className="action-card__title">Report ADR</h3>
+            <p className="action-card__description">Side effects</p>
+          </Card>
+
+          <Card className="action-card" clickable onClick={() => navigate('/pharmacy-finder')}>
+            <div className="action-card__icon">🏥</div>
+            <h3 className="action-card__title">Find Pharmacy</h3>
+            <p className="action-card__description">Nearby locations</p>
+          </Card>
+
+          <Card className="action-card" clickable onClick={handleStartTutorial}>
+            <div className="action-card__icon">🎓</div>
+            <h3 className="action-card__title">Tutorial</h3>
+            <p className="action-card__description">Learn features</p>
+          </Card>
         </div>
       </div>
 
-      {/* Weekly Trend */}
-      <div
-        style={{
-          border: "1px solid rgba(0,0,0,0.06)",
-          borderRadius: 10,
-          padding: 12,
-          backgroundColor: darkMode ? "#071029" : "#fff",
-          maxWidth: 600,
-          marginTop: 20,
-        }}
-      >
-        <h4>💊 Adherence Trend (last 7 days)</h4>
-        {weeklyTrend.length === 0 ? (
-          <p>No adherence data yet.</p>
-        ) : (
-          <div style={{ width: "100%", height: 200 }}>
-            <ResponsiveContainer>
+      {/* Upcoming Medications */}
+      {upcomingMeds.length > 0 && (
+        <Card className="dashboard__upcoming">
+          <h3 className="card-title">Upcoming Medications</h3>
+          <div className="upcoming-list">
+            {upcomingMeds.map((med) => (
+              <div key={med.id} className="upcoming-item">
+                <div className="upcoming-item__time">{med.time || "Not set"}</div>
+                <div className="upcoming-item__info">
+                  <div className="upcoming-item__name">{med.name}</div>
+                  <div className="upcoming-item__dosage">{med.dosage}</div>
+                </div>
+                <Button
+                  variant="primary"
+                  size="small"
+                  onClick={() => markAsTaken(med.id)}
+                >
+                  Take Now
+                </Button>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {/* Adherence Trend */}
+      {weeklyTrend.length > 0 && (
+        <Card className="dashboard__chart">
+          <h3 className="card-title">7-Day Adherence Trend</h3>
+          <p className="card-subtitle">Your weekly progress</p>
+          <div className="chart-container">
+            <ResponsiveContainer width="100%" height={200}>
               <BarChart data={weeklyTrend}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" tick={{ fontSize: 11, fill: text }} />
-                <YAxis domain={[0, 100]} tick={{ fill: text }} />
-                <Tooltip />
-                <Bar dataKey="adherence" fill="#22c55e" barSize={28} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--neutral-200)" />
+                <XAxis 
+                  dataKey="date" 
+                  tick={{ fontSize: 12, fill: "var(--neutral-600)" }}
+                />
+                <YAxis 
+                  domain={[0, 100]} 
+                  tick={{ fill: "var(--neutral-600)" }}
+                />
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: "var(--neutral-0)",
+                    border: "1px solid var(--neutral-200)",
+                    borderRadius: "var(--radius-md)"
+                  }}
+                />
+                <Bar 
+                  dataKey="adherence" 
+                  fill="var(--primary-500)" 
+                  radius={[8, 8, 0, 0]}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
-        )}
-      </div>
+        </Card>
+      )}
 
-      {/* ADR Section */}
-      <div style={{ display: "grid", gap: 16, maxWidth: 600, marginTop: 20 }}>
-        <div style={{ background: darkMode ? "#071029" : "#fff", padding: 12, borderRadius: 10 }}>
-          <h4>⚠️ Report an ADR</h4>
-          <form onSubmit={handleADRSubmit} style={{ display: "grid", gap: 8 }}>
-            <input
-              name="medication"
-              value={adrForm.medication}
-              onChange={handleChange}
-              placeholder="Medication name"
-              style={{ padding: 8, borderRadius: 6, border: "1px solid #cbd5e1" }}
-              required
-            />
-            <input
-              name="symptom"
-              value={adrForm.symptom}
-              onChange={handleChange}
-              placeholder="Symptom / Reaction"
-              style={{ padding: 8, borderRadius: 6, border: "1px solid #cbd5e1" }}
-              required
-            />
-            <select name="severity" value={adrForm.severity} onChange={handleChange} style={{ padding: 8 }}>
-              <option>Mild</option>
-              <option>Moderate</option>
-              <option>Severe</option>
-            </select>
-            <button
-              type="submit"
-              style={{
-                background: "#007bff",
-                color: "#fff",
-                padding: "8px 12px",
-                borderRadius: 6,
-                border: "none",
-                cursor: "pointer",
-              }}
-            >
-              Submit ADR
-            </button>
-          </form>
-        </div>
-
-        <div style={{ background: darkMode ? "#071029" : "#f8fafc", padding: 12, borderRadius: 10 }}>
-          <h4>🩺 Recent ADR Reports</h4>
-          <input
-            placeholder="Search ADRs..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ padding: 8, borderRadius: 6, width: "100%", marginBottom: 8 }}
-          />
-          {filteredReports.length === 0 ? (
-            <p>No ADRs found.</p>
-          ) : (
-            <ul style={{ listStyle: "none", padding: 0 }}>
-              {filteredReports.map((r) => (
-                <li
-                  key={r.id}
-                  style={{
-                    padding: 8,
-                    borderBottom: "1px solid rgba(0,0,0,0.05)",
-                    display: "flex",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <div>
-                    <strong>{r.medication}</strong> — {r.symptom}
-                    <br />
-                    <small>
-                      {r.date} • <em>{r.severity}</em>
-                    </small>
-                  </div>
-                  <button
-                    onClick={() => handleDeleteADR(r.id)}
-                    style={{ background: "transparent", border: "none", color: "red", cursor: "pointer" }}
-                  >
-                    ❌
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </div>
-
-      {/* Medications Quick List */}
-      <div style={{ marginTop: 20, maxWidth: 600 }}>
-        <h4>🗒️ Your medications (quick access)</h4>
-        {medications.length === 0 ? (
-          <p>No medications added yet.</p>
-        ) : (
-          <ul style={{ listStyle: "none", padding: 0 }}>
-            {medications.map((m) => (
-              <li
-                key={m.id}
-                style={{
-                  padding: 8,
-                  borderBottom: "1px solid rgba(0,0,0,0.05)",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <div>
-                  <strong>{m.name}</strong> — {m.dosage}
-                  <br />
-                  <small>
-                    {m.time || "time not set"} {m.taken ? `• Taken ${m.takenAt || ""}` : ""}
-                  </small>
+      {/* Recent Activity */}
+      {recentActivity.length > 0 && (
+        <Card className="dashboard__activity">
+          <h3 className="card-title">Recent Activity</h3>
+          <div className="activity-list">
+            {recentActivity.map((activity, index) => (
+              <div key={index} className="activity-item">
+                <div className="activity-item__icon">{activity.icon}</div>
+                <div className="activity-item__content">
+                  <div className="activity-item__text">{activity.text}</div>
+                  <div className="activity-item__time">{activity.time}</div>
                 </div>
-                <div style={{ display: "flex", gap: 8 }}>
-                  {!m.taken && (
-                    <button
-                      onClick={() => markAsTaken(m.id)}
-                      style={{
-                        background: "#2563eb",
-                        color: "#fff",
-                        border: "none",
-                        padding: "6px 10px",
-                        borderRadius: 6,
-                        cursor: "pointer",
-                      }}
-                    >
-                      Mark taken
-                    </button>
-                  )}
-                  <button
-                    onClick={() => deleteMedication(m.id)}
-                    style={{ background: "transparent", border: "none", color: "red", cursor: "pointer" }}
-                  >
-                    ❌
-                  </button>
-                </div>
-              </li>
+              </div>
             ))}
-          </ul>
-        )}
-      </div>
+          </div>
+        </Card>
+      )}
 
-      <UpgradeModal show={showUpgrade} onClose={() => setShowUpgrade(false)} onUpgrade={handleUpgrade} />
+      {/* Empty State */}
+      {medications.length === 0 && (
+        <Card className="dashboard__empty">
+          <div className="empty-state">
+            <div className="empty-state__icon">💊</div>
+            <h3 className="empty-state__title">No medications yet</h3>
+            <p className="empty-state__description">
+              Start by adding your first medication to track your adherence
+            </p>
+            <Button
+              variant="primary"
+              size="large"
+              onClick={() => navigate('/medications')}
+            >
+              Add Medication
+            </Button>
+          </div>
+        </Card>
+      )}
+
+      {/* Premium Upgrade CTA */}
+      {plan === "free" && (
+        <Card className="dashboard__premium">
+          <div className="premium-cta">
+            <div className="premium-cta__content">
+              <h3 className="premium-cta__title">Unlock Premium Features</h3>
+              <p className="premium-cta__description">
+                Unlimited medications, advanced analytics, and more
+              </p>
+            </div>
+            <Button
+              variant="accent"
+              onClick={() => setShowUpgrade(true)}
+            >
+              Upgrade Now
+            </Button>
+          </div>
+        </Card>
+      )}
+
+      <UpgradeModal 
+        show={showUpgrade} 
+        onClose={() => setShowUpgrade(false)} 
+        onUpgrade={handleUpgrade} 
+      />
     </div>
   );
 };

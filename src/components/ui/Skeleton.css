@@ -1,0 +1,199 @@
+/**
+ * Skeleton Component Styles
+ * Mobile-first loading placeholders
+ */
+
+.skeleton {
+  background: var(--neutral-200);
+  border-radius: var(--radius-sm);
+  display: block;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ============================================
+   VARIANTS
+   ============================================ */
+
+.skeleton--text {
+  height: 1em;
+  margin-bottom: var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+.skeleton--title {
+  height: 1.5em;
+  margin-bottom: var(--space-3);
+  border-radius: var(--radius-md);
+}
+
+.skeleton--avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+}
+
+.skeleton--thumbnail {
+  width: 100%;
+  height: 200px;
+  border-radius: var(--radius-lg);
+}
+
+.skeleton--rectangle {
+  width: 100%;
+  height: 100px;
+  border-radius: var(--radius-md);
+}
+
+/* ============================================
+   CIRCLE VARIANT
+   ============================================ */
+
+.skeleton--circle {
+  border-radius: var(--radius-full);
+}
+
+/* ============================================
+   SHIMMER ANIMATION
+   ============================================ */
+
+.skeleton--animated::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* ============================================
+   SKELETON GROUP
+   ============================================ */
+
+.skeleton-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* ============================================
+   COMMON SKELETON PATTERNS
+   ============================================ */
+
+/* Card Skeleton */
+.skeleton-card {
+  background: var(--neutral-0);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--neutral-200);
+}
+
+.skeleton-card__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.skeleton-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* List Item Skeleton */
+.skeleton-list-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: var(--neutral-0);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-2);
+}
+
+.skeleton-list-item__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+/* Mobile: Smaller skeleton sizes */
+@media (max-width: 639px) {
+  .skeleton--thumbnail {
+    height: 150px;
+  }
+  
+  .skeleton--avatar {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* Tablet and up: Larger skeleton sizes */
+@media (min-width: 768px) {
+  .skeleton--thumbnail {
+    height: 250px;
+  }
+  
+  .skeleton--avatar {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton--animated::before {
+    animation: none;
+  }
+  
+  /* Use pulse animation instead */
+  .skeleton--animated {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
+
+/* ============================================
+   DARK MODE SUPPORT (Future)
+   ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  .skeleton {
+    background: var(--neutral-700);
+  }
+  
+  .skeleton--animated::before {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.1) 50%,
+      transparent 100%
+    );
+  }
+}

@@ -2,9 +2,12 @@
 import React, { useState } from "react";
 import { queueAction } from "../utils/offlineQueue";
 import { useTranslation } from "react-i18next";
+import usageLimiter from "../utils/usageLimiter";
+import { useNavigate } from "react-router-dom";
 
 const MedicationForm = ({ onAddMedication }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -21,6 +24,16 @@ const MedicationForm = ({ onAddMedication }) => {
 
     if (!formData.name || !formData.dosage || !formData.time) {
       alert(t("please_fill_all_fields"));
+      return;
+    }
+
+    // Check usage limits before allowing medication addition
+    if (!usageLimiter.canAddMedication()) {
+      const stats = usageLimiter.getUsageStats();
+      alert(
+        `You've reached your free limit of ${stats.medicationLimit} medications. Upgrade to Premium for unlimited access!`
+      );
+      navigate("/premium");
       return;
     }
 
@@ -46,6 +59,9 @@ const MedicationForm = ({ onAddMedication }) => {
       if (onAddMedication) {
         onAddMedication(formData);
       }
+
+      // Increment usage counter after successful addition
+      usageLimiter.incrementMedicationCount();
 
       setFormData({ name: "", dosage: "", time: "" });
     } catch (err) {

@@ -1,0 +1,392 @@
+.pharmacy-finder {
+  padding: var(--space-4);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-bottom: calc(var(--space-20) + 60px);
+}
+
+/* Header */
+.pharmacy-finder__header {
+  text-align: center;
+  margin-bottom: var(--space-6);
+}
+
+.pharmacy-finder__title {
+  font-size: var(--text-3xl);
+  font-weight: var(--font-bold);
+  color: var(--neutral-900);
+  margin: 0 0 var(--space-2) 0;
+}
+
+.pharmacy-finder__subtitle {
+  font-size: var(--text-base);
+  color: var(--neutral-600);
+  margin: 0;
+}
+
+.pharmacy-finder__alert {
+  margin-bottom: var(--space-4);
+}
+
+/* Sticky Filter Bar */
+.filter-bar {
+  position: sticky;
+  top: 60px; /* Account for header */
+  z-index: 10;
+  background: var(--neutral-0);
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-bottom: var(--space-6);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.filter-bar__content {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-end;
+  margin-bottom: var(--space-2);
+}
+
+.filter-bar__radius {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.filter-bar__label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--neutral-700);
+}
+
+.filter-bar__info {
+  font-size: var(--text-sm);
+  color: var(--neutral-600);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--neutral-200);
+}
+
+/* Manual Entry */
+.manual-entry {
+  margin-bottom: var(--space-6);
+  animation: slideDown 300ms ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.manual-entry__header {
+  margin-bottom: var(--space-4);
+}
+
+.manual-entry__title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--neutral-900);
+  margin: 0 0 var(--space-1) 0;
+}
+
+.manual-entry__description {
+  font-size: var(--text-sm);
+  color: var(--neutral-600);
+  margin: 0;
+}
+
+.manual-entry__inputs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.manual-entry__actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+/* Error Content */
+.error-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.error-actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+/* Pharmacy Results */
+.pharmacy-results {
+  margin-bottom: var(--space-6);
+}
+
+.pharmacy-results__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-2);
+  gap: var(--space-3);
+}
+
+.pharmacy-results__title {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  color: var(--neutral-900);
+  margin: 0;
+}
+
+.pharmacy-results__cache-info {
+  font-size: var(--text-sm);
+  color: var(--neutral-500);
+  margin: 0 0 var(--space-4) 0;
+}
+
+/* Pharmacy List */
+.pharmacy-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Pharmacy Card */
+.pharmacy-card {
+  transition: all 200ms ease;
+}
+
+.pharmacy-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.pharmacy-card--loading {
+  pointer-events: none;
+}
+
+.pharmacy-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-4);
+  gap: var(--space-3);
+}
+
+.pharmacy-card__info {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.pharmacy-card__name {
+  font-size: var(--text-xl);
+  font-weight: var(--font-semibold);
+  color: var(--neutral-900);
+  margin: 0;
+}
+
+.pharmacy-card__distance {
+  flex-shrink: 0;
+}
+
+.pharmacy-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.pharmacy-card__detail {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-size: var(--text-base);
+  color: var(--neutral-700);
+}
+
+.pharmacy-card__icon {
+  font-size: var(--text-lg);
+  line-height: 1.5;
+  flex-shrink: 0;
+}
+
+.pharmacy-card__text {
+  line-height: 1.5;
+}
+
+.pharmacy-card__link {
+  color: var(--primary-600);
+  text-decoration: none;
+  line-height: 1.5;
+  transition: color 200ms ease;
+}
+
+.pharmacy-card__link:hover {
+  color: var(--primary-700);
+  text-decoration: underline;
+}
+
+.pharmacy-card__actions {
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--neutral-200);
+}
+
+/* Empty State */
+.empty-state {
+  background: var(--neutral-0);
+  border-radius: var(--radius-xl);
+  padding: var(--space-12);
+  text-align: center;
+  border: 2px dashed var(--neutral-300);
+}
+
+.empty-state__icon {
+  font-size: 4rem;
+  line-height: 1;
+  margin-bottom: var(--space-4);
+}
+
+.empty-state__title {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  color: var(--neutral-800);
+  margin: 0 0 var(--space-2) 0;
+}
+
+.empty-state__description {
+  font-size: var(--text-base);
+  color: var(--neutral-600);
+  margin: 0 0 var(--space-6) 0;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.empty-state__hint {
+  font-size: var(--text-sm);
+  color: var(--neutral-500);
+  margin: var(--space-4) 0 0 0;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .pharmacy-finder {
+    padding: var(--space-3);
+  }
+
+  .pharmacy-finder__title {
+    font-size: var(--text-2xl);
+  }
+
+  .filter-bar {
+    top: 0;
+  }
+
+  .filter-bar__content {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-bar__radius {
+    width: 100%;
+  }
+
+  .pharmacy-results__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .manual-entry__inputs {
+    grid-template-columns: 1fr;
+  }
+
+  .manual-entry__actions {
+    flex-direction: column;
+  }
+
+  .error-actions {
+    flex-direction: column;
+  }
+
+  .error-actions > button {
+    width: 100%;
+  }
+
+  .pharmacy-card__header {
+    flex-direction: column;
+  }
+
+  .pharmacy-card__info {
+    width: 100%;
+  }
+
+  .pharmacy-card__distance {
+    align-self: flex-start;
+  }
+}
+
+@media (min-width: 768px) {
+  .pharmacy-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .filter-bar__content {
+    max-width: 600px;
+  }
+}
+
+/* Animations */
+.pharmacy-card {
+  animation: slideUp 400ms ease-out backwards;
+}
+
+.pharmacy-card:nth-child(1) { animation-delay: 0ms; }
+.pharmacy-card:nth-child(2) { animation-delay: 50ms; }
+.pharmacy-card:nth-child(3) { animation-delay: 100ms; }
+.pharmacy-card:nth-child(4) { animation-delay: 150ms; }
+.pharmacy-card:nth-child(5) { animation-delay: 200ms; }
+.pharmacy-card:nth-child(6) { animation-delay: 250ms; }
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .pharmacy-card,
+  .manual-entry {
+    animation: none;
+  }
+
+  .pharmacy-card:hover {
+    transform: none;
+  }
+
+  .filter-bar {
+    backdrop-filter: none;
+  }
+}

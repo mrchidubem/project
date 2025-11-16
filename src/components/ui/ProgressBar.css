@@ -1,0 +1,263 @@
+/**
+ * ProgressBar Component Styles
+ * Mobile-first progress indicator
+ */
+
+.progress-wrapper {
+  width: 100%;
+  margin-bottom: var(--space-4);
+}
+
+/* ============================================
+   LABEL
+   ============================================ */
+
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-2);
+  font-size: var(--text-sm);
+}
+
+.progress-label__text {
+  color: var(--neutral-700);
+  font-weight: var(--font-medium);
+}
+
+.progress-label__percentage {
+  color: var(--neutral-600);
+  font-weight: var(--font-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================
+   TRACK
+   ============================================ */
+
+.progress-track {
+  width: 100%;
+  background: var(--neutral-200);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  position: relative;
+}
+
+/* ============================================
+   BAR
+   ============================================ */
+
+.progress-bar {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.3s ease-in-out;
+  position: relative;
+}
+
+/* ============================================
+   SIZES
+   ============================================ */
+
+.progress-bar--sm {
+  height: 4px;
+}
+
+.progress-bar--md {
+  height: 8px;
+}
+
+.progress-bar--lg {
+  height: 12px;
+}
+
+/* ============================================
+   COLORS
+   ============================================ */
+
+.progress-bar--primary {
+  background: var(--primary-500);
+}
+
+.progress-bar--secondary {
+  background: var(--secondary-500);
+}
+
+.progress-bar--accent {
+  background: var(--accent-500);
+}
+
+.progress-bar--success {
+  background: var(--success);
+}
+
+/* ============================================
+   STRIPED PATTERN
+   ============================================ */
+
+.progress-bar--striped {
+  background-image: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.15) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.15) 50%,
+    rgba(255, 255, 255, 0.15) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 1rem 1rem;
+}
+
+/* ============================================
+   ANIMATED STRIPES
+   ============================================ */
+
+.progress-bar--animated {
+  animation: progressStripes 1s linear infinite;
+}
+
+@keyframes progressStripes {
+  from {
+    background-position: 1rem 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+/* ============================================
+   CIRCULAR PROGRESS (Alternative)
+   ============================================ */
+
+.progress-circular {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-circular__svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.progress-circular__track {
+  fill: none;
+  stroke: var(--neutral-200);
+  stroke-width: 8;
+}
+
+.progress-circular__bar {
+  fill: none;
+  stroke: var(--primary-500);
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.3s ease-in-out;
+}
+
+.progress-circular__label {
+  position: absolute;
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  color: var(--neutral-800);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+/* Mobile: Slightly thinner progress bars */
+@media (max-width: 639px) {
+  .progress-bar--lg {
+    height: 10px;
+  }
+  
+  .progress-circular {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .progress-circular__label {
+    font-size: var(--text-xl);
+  }
+}
+
+/* Tablet and up: Larger progress bars */
+@media (min-width: 768px) {
+  .progress-bar--lg {
+    height: 14px;
+  }
+  
+  .progress-circular {
+    width: 140px;
+    height: 140px;
+  }
+}
+
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .progress-bar {
+    transition: none;
+  }
+  
+  .progress-bar--animated {
+    animation: none;
+  }
+  
+  .progress-circular__bar {
+    transition: none;
+  }
+}
+
+/* ============================================
+   STATES
+   ============================================ */
+
+/* Indeterminate state (for unknown progress) */
+.progress-bar--indeterminate {
+  animation: progressIndeterminate 1.5s ease-in-out infinite;
+}
+
+@keyframes progressIndeterminate {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* ============================================
+   DARK MODE SUPPORT (Future)
+   ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  .progress-track {
+    background: var(--neutral-700);
+  }
+  
+  .progress-label__text {
+    color: var(--neutral-300);
+  }
+  
+  .progress-label__percentage {
+    color: var(--neutral-400);
+  }
+  
+  .progress-circular__track {
+    stroke: var(--neutral-700);
+  }
+  
+  .progress-circular__label {
+    color: var(--neutral-200);
+  }
+}

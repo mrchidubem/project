@@ -1,0 +1,221 @@
+/**
+ * Badge Component Styles
+ * Mobile-first status indicators
+ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-primary);
+  font-weight: var(--font-semibold);
+  line-height: 1;
+  border-radius: var(--radius-md);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+/* ============================================
+   SIZES
+   ============================================ */
+
+.badge--sm {
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-xs);
+  min-height: 18px;
+}
+
+.badge--md {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  min-height: 22px;
+}
+
+.badge--lg {
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-base);
+  min-height: 28px;
+}
+
+/* ============================================
+   VARIANTS
+   ============================================ */
+
+.badge--primary {
+  background: var(--primary-100);
+  color: var(--primary-700);
+}
+
+.badge--secondary {
+  background: var(--secondary-100);
+  color: var(--secondary-700);
+}
+
+.badge--accent {
+  background: var(--accent-100);
+  color: var(--accent-700);
+}
+
+.badge--success {
+  background: var(--success-light);
+  color: var(--success-dark);
+}
+
+.badge--warning {
+  background: var(--warning-light);
+  color: var(--warning-dark);
+}
+
+.badge--error {
+  background: var(--error-light);
+  color: var(--error-dark);
+}
+
+.badge--neutral {
+  background: var(--neutral-200);
+  color: var(--neutral-700);
+}
+
+/* ============================================
+   PILL SHAPE
+   ============================================ */
+
+.badge--pill {
+  border-radius: var(--radius-full);
+}
+
+/* ============================================
+   DOT INDICATOR
+   ============================================ */
+
+.badge--dot {
+  padding: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  min-height: 8px;
+}
+
+.badge--dot.badge--md {
+  width: 10px;
+  height: 10px;
+  min-height: 10px;
+}
+
+.badge--dot.badge--lg {
+  width: 12px;
+  height: 12px;
+  min-height: 12px;
+}
+
+/* Dot variants - solid colors */
+.badge--dot.badge--primary {
+  background: var(--primary-500);
+}
+
+.badge--dot.badge--secondary {
+  background: var(--secondary-500);
+}
+
+.badge--dot.badge--accent {
+  background: var(--accent-500);
+}
+
+.badge--dot.badge--success {
+  background: var(--success);
+}
+
+.badge--dot.badge--warning {
+  background: var(--warning);
+}
+
+.badge--dot.badge--error {
+  background: var(--error);
+}
+
+.badge--dot.badge--neutral {
+  background: var(--neutral-400);
+}
+
+/* ============================================
+   BADGE WITH ICON
+   ============================================ */
+
+.badge--with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.badge__icon {
+  width: 1em;
+  height: 1em;
+  flex-shrink: 0;
+}
+
+/* ============================================
+   BADGE POSITIONING (for overlays)
+   ============================================ */
+
+.badge-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.badge--positioned {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(50%, -50%);
+  box-shadow: 0 0 0 2px var(--neutral-0);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+/* Mobile: Ensure badges are readable */
+@media (max-width: 639px) {
+  .badge--sm {
+    font-size: 11px;
+    min-height: 20px;
+  }
+  
+  .badge--md {
+    font-size: 12px;
+    min-height: 24px;
+  }
+}
+
+/* ============================================
+   PRINT
+   ============================================ */
+
+@media print {
+  .badge {
+    border: 1px solid currentColor;
+  }
+  
+  .badge--dot {
+    border: 2px solid currentColor;
+  }
+}
+
+/* ============================================
+   BADGE GROUPS
+   ============================================ */
+
+.badge-group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+/* Mobile: Stack badges if needed */
+@media (max-width: 374px) {
+  .badge-group {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
-import MedicationForm from "./MedicationForm";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   LineChart,
   Line,
@@ -9,27 +10,44 @@ import {
   CartesianGrid,
   ResponsiveContainer,
 } from "recharts";
+import { Card, Input, ProgressBar, Badge, Button } from "./ui";
+import MedicationForm from "./MedicationForm";
 import { generateICS, downloadICS } from "../utils/ics";
-import { useNavigate } from "react-router-dom";
-import { queueAction, syncQueuedActions } from "../utils/offlineQueue"; // ✅ added
+import { queueAction, syncQueuedActions } from "../utils/offlineQueue";
+import usageLimiter from "../utils/usageLimiter";
+import onboardingManager from "../utils/onboardingManager";
+import "./MedicationList.css";
 
 const MedicationList = () => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
   const [medications, setMedications] = useState([]);
   const [adherence, setAdherence] = useState(0);
   const [adherenceHistory, setAdherenceHistory] = useState({});
-  const [plan, setPlan] = useState("free");
+  const [usageStats, setUsageStats] = useState(null);
   const [showUpgrade, setShowUpgrade] = useState(false);
-  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all"); // all, taken, pending
+  const [expandedCards, setExpandedCards] = useState(new Set());
+
+  const plan = usageStats?.isPremium ? "premium" : "free";
+
+  const handleStartTutorial = () => {
+    onboardingManager.startManualTutorial();
+    window.dispatchEvent(new CustomEvent('restartOnboarding'));
+  };
 
   // Load saved data
   useEffect(() => {
     const savedMeds = JSON.parse(localStorage.getItem("medications")) || [];
     const savedHistory = JSON.parse(localStorage.getItem("adherenceHistory")) || {};
-    const savedPlan = localStorage.getItem("plan") || "free";
 
     setMedications(savedMeds);
     setAdherenceHistory(savedHistory);
-    setPlan(savedPlan);
+    
+    usageLimiter.synchronizeUsageCounts();
+    const stats = usageLimiter.getUsageStats();
+    setUsageStats(stats);
   }, []);
 
   // Save when medications change
@@ -39,7 +57,7 @@ const MedicationList = () => {
     calculateAdherence();
   }, [medications]);
 
-  // ✅ Auto-sync when device goes online
+  // Auto-sync when online
   useEffect(() => {
     const handleOnline = () => {
       console.log("🔁 Back online — syncing queued medication data...");
@@ -56,7 +74,7 @@ const MedicationList = () => {
     }
   }, []);
 
-  // Smart reminders every minute
+  // Smart reminders
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
@@ -68,7 +86,6 @@ const MedicationList = () => {
         if (med.time === currentTime && !med.taken) {
           showReminder(med);
 
-          // Repeat after 30 min if untaken
           setTimeout(() => {
             const refreshed = JSON.parse(localStorage.getItem("medications")) || [];
             const stillUntaken = refreshed.find((m) => m.id === med.id && !m.taken);
@@ -85,20 +102,19 @@ const MedicationList = () => {
 
   const showReminder = (med, isRepeat = false) => {
     const msg = isRepeat
-      ? `⏰ Reminder: You still haven't taken ${med.name} (${med.dosage})`
-      : `It's time to take your ${med.name} (${med.dosage})`;
+      ? t('reminder_still_untaken') + ` ${med.name} (${med.dosage})`
+      : t('time_to_take') + ` ${med.name} (${med.dosage})`;
 
     if ("Notification" in window && Notification.permission === "granted") {
-      new Notification("Medication Reminder 💊", { body: msg });
+      new Notification(t('medication_reminder'), { body: msg });
     } else {
       alert(msg);
     }
   };
 
-  // ✅ Add medication (offline-safe)
   const addMedication = async (med) => {
     if (plan === "free" && medications.length >= 3) {
-      alert("You’ve reached your free limit. Upgrade to Premium for unlimited access!");
+      alert(t('free_limit_reached'));
       setShowUpgrade(true);
       return;
     }
@@ -107,19 +123,22 @@ const MedicationList = () => {
     const updatedList = [...medications, newMed];
     setMedications(updatedList);
 
+    const stats = usageLimiter.getUsageStats();
+    setUsageStats(stats);
+
     const payload = { type: "medication", data: newMed, timestamp: Date.now() };
 
     try {
       if (!navigator.onLine) {
         await queueAction(payload);
-        alert("You’re offline. Medication saved locally and will sync when back online.");
+        alert(t('offline_saved'));
       } else {
         await fetch("/api/sync", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
-        console.log("Medication synced successfully.");
+        console.log(t('medication_synced'));
       }
     } catch (err) {
       console.error("Error syncing medication:", err);
@@ -166,19 +185,25 @@ const MedicationList = () => {
 
     if (percent === 100) {
       if ("Notification" in window && Notification.permission === "granted") {
-        new Notification("🎉 Excellent!", {
-          body: "You’ve taken all your meds for today. Keep it up!",
+        new Notification(t('excellent_all_taken'), {
+          body: t('all_meds_today'),
         });
       } else {
-        alert("🎉 You’ve taken all your meds for today. Keep it up!");
+        alert(t('all_meds_today'));
       }
     }
   };
 
   const deleteMedication = async (id) => {
+    if (!confirm(t('delete_medication_confirm') || "Delete this medication?")) return;
+    
     const filtered = medications.filter((med) => med.id !== id);
     setMedications(filtered);
     updateDailyAdherence(filtered);
+
+    usageLimiter.decrementMedicationCount();
+    const stats = usageLimiter.getUsageStats();
+    setUsageStats(stats);
 
     const payload = { type: "deleteMedication", data: { id }, timestamp: Date.now() };
 
@@ -208,236 +233,322 @@ const MedicationList = () => {
   };
 
   const handleExportICS = () => {
-    if (medications.length === 0) return alert("No medications to export.");
+    if (medications.length === 0) return alert(t('no_medications_export'));
     const icsText = generateICS(medications, 30);
     downloadICS(icsText);
   };
 
+  const handlePremiumUpgradeSuccess = () => {
+    try {
+      const expiryDate = new Date();
+      expiryDate.setMonth(expiryDate.getMonth() + 1);
+      usageLimiter.setPremiumStatus(expiryDate);
+      console.log("Premium upgrade successful - status updated");
+    } catch (err) {
+      console.error("Failed to update premium status:", err);
+    }
+  };
+
   const handleUpgrade = () => {
+    handlePremiumUpgradeSuccess();
     localStorage.setItem("plan", "premium");
-    setPlan("premium");
     setShowUpgrade(false);
-    alert("🎉 Upgrade successful! You’re now on the Premium plan.");
+    alert(t('upgrade_successful'));
     navigate("/premium");
   };
+
+  const toggleCardExpansion = (id) => {
+    const newExpanded = new Set(expandedCards);
+    if (newExpanded.has(id)) {
+      newExpanded.delete(id);
+    } else {
+      newExpanded.add(id);
+    }
+    setExpandedCards(newExpanded);
+  };
+
+  // Filter and search medications
+  const filteredMedications = medications.filter((med) => {
+    const matchesSearch = med.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         med.dosage.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesFilter = filterStatus === "all" ||
+                         (filterStatus === "taken" && med.taken) ||
+                         (filterStatus === "pending" && !med.taken);
+    return matchesSearch && matchesFilter;
+  });
 
   const chartData = Object.entries(adherenceHistory).map(([date, percent]) => ({
     date,
     percent,
   }));
 
+  if (!usageStats) {
+    return <div className="medication-list__loading">{t('loading')}</div>;
+  }
+
   return (
-    <div style={{ padding: "1rem" }}>
-      <h2>My Medications 💊</h2>
-      <p>
-        <strong>Adherence Rate:</strong> {adherence}% ✅
-      </p>
-
-      {plan === "free" && (
-        <p style={{ color: "gray", marginBottom: "10px" }}>
-          Free plan usage: {medications.length}/3 medications used
-        </p>
-      )}
-
-      {plan === "free" && medications.length >= 3 && (
-        <div
-          style={{
-            backgroundColor: "#fff3cd",
-            border: "1px solid #ffeeba",
-            color: "#856404",
-            padding: "10px",
-            borderRadius: "8px",
-            marginBottom: "1rem",
-          }}
+    <div className="medication-list">
+      {/* Header */}
+      <div className="medication-list__header">
+        <div>
+          <h1 className="medication-list__title">{t('my_medications')}</h1>
+          <p className="medication-list__subtitle">
+            {t('adherence_rate')}: <strong>{adherence}%</strong>
+          </p>
+        </div>
+        <Button
+          variant="secondary"
+          size="small"
+          onClick={handleStartTutorial}
+          title={t('tutorial_help')}
         >
-          ⚠️ You’ve reached your free plan limit (3 medications).{" "}
-          <button
-            onClick={() => navigate("/premium")}
-            style={{
-              background: "#28a745",
-              color: "#fff",
-              border: "none",
-              padding: "6px 12px",
-              borderRadius: "5px",
-              cursor: "pointer",
-              marginLeft: "10px",
-            }}
-          >
-            Upgrade Now
-          </button>
+          {t('replay_tutorial')} 🎓
+        </Button>
+      </div>
+
+      {/* Usage Stats */}
+      {!usageStats.isPremium && (
+        <div className="usage-stats">
+          <div className="usage-stats__content">
+            <span className="usage-stats__label">{t('free_plan_usage')}</span>
+            <span className="usage-stats__value">
+              {usageStats.medicationCount}/{usageStats.medicationLimit} {t('medications_used')}
+            </span>
+          </div>
+          <ProgressBar 
+            value={usageStats.medicationCount} 
+            max={usageStats.medicationLimit}
+            variant={usageStats.medicationCount >= usageStats.medicationLimit ? "warning" : "primary"}
+          />
         </div>
       )}
 
-      <div style={{ display: "flex", gap: "10px", marginBottom: "1rem" }}>
-        <button
-          onClick={handleExportICS}
-          style={{
-            backgroundColor: "#6f42c1",
-            color: "#fff",
-            border: "none",
-            padding: "8px 12px",
-            borderRadius: "6px",
-            cursor: "pointer",
-          }}
-        >
-          Export .ics (30 days)
-        </button>
+      {/* Limit Warning */}
+      {!usageStats.isPremium && usageStats.medicationCount >= usageStats.medicationLimit && (
+        <div className="limit-warning">
+          <div className="limit-warning__content">
+            <span className="limit-warning__icon">⚠️</span>
+            <div>
+              <strong>{t('reached_free_limit')}</strong>
+              <p>{t('free_plan_limit_modal')}</p>
+            </div>
+          </div>
+          <Button
+            variant="primary"
+            size="small"
+            onClick={() => navigate("/premium")}
+          >
+            {t('upgrade_now')}
+          </Button>
+        </div>
+      )}
 
-        <button
+      {/* Actions Bar */}
+      <div className="medication-list__actions">
+        <Button
+          variant="secondary"
+          size="small"
+          onClick={handleExportICS}
+        >
+          {t('export_ics')}
+        </Button>
+        <Button
+          variant="secondary"
+          size="small"
           onClick={() => {
-            if (confirm("Clear all medications?")) {
+            if (confirm(t('clear_all_confirm'))) {
               setMedications([]);
               localStorage.removeItem("medications");
             }
           }}
-          style={{
-            backgroundColor: "#dc3545",
-            color: "#fff",
-            border: "none",
-            padding: "8px 12px",
-            borderRadius: "6px",
-            cursor: "pointer",
-          }}
         >
-          Clear All
-        </button>
+          {t('clear_all')}
+        </Button>
       </div>
 
+      {/* Add Medication Form */}
       <MedicationForm onAddMedication={addMedication} />
 
+      {/* Adherence Chart */}
       {chartData.length > 0 && (
-        <div
-          style={{
-            background: "#fff",
-            border: "1px solid #ddd",
-            borderRadius: "8px",
-            padding: "1rem",
-            margin: "1rem 0",
-          }}
-        >
-          <h3>📊 Adherence Trend</h3>
-          <ResponsiveContainer width="100%" height={250}>
-            <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis domain={[0, 100]} />
-              <Tooltip />
-              <Line type="monotone" dataKey="percent" stroke="#007bff" strokeWidth={2} />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+        <Card className="adherence-chart">
+          <div className="adherence-chart__header">
+            <h3 className="adherence-chart__title">📊 {t('adherence_trend')}</h3>
+          </div>
+          <div className="adherence-chart__body">
+            <ResponsiveContainer width="100%" height={250}>
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--neutral-200)" />
+                <XAxis 
+                  dataKey="date" 
+                  tick={{ fontSize: 12, fill: "var(--neutral-600)" }}
+                />
+                <YAxis 
+                  domain={[0, 100]} 
+                  tick={{ fill: "var(--neutral-600)" }}
+                />
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: "var(--neutral-0)",
+                    border: "1px solid var(--neutral-200)",
+                    borderRadius: "var(--radius-md)"
+                  }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="percent" 
+                  stroke="var(--primary-500)" 
+                  strokeWidth={2}
+                  dot={{ fill: "var(--primary-500)", r: 4 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
       )}
 
-      <ul style={{ listStyle: "none", padding: 0 }}>
-        {medications.length === 0 ? (
-          <p>No medications added yet.</p>
-        ) : (
-          medications.map((med) => (
-            <li
-              key={med.id}
-              style={{
-                border: "1px solid #ddd",
-                borderRadius: "8px",
-                padding: "10px",
-                margin: "10px 0",
-                backgroundColor: med.taken ? "#e8f5e9" : "#fff",
-              }}
-            >
-              <strong>{med.name}</strong> — {med.dosage} at {med.time}
-              {med.taken && (
-                <span style={{ color: "green", marginLeft: "10px" }}>
-                  ✔ Taken at {med.takenAt}
-                </span>
-              )}
-              <br />
-              {!med.taken && (
-                <button
-                  onClick={() => markAsTaken(med.id)}
-                  style={{
-                    backgroundColor: "#007bff",
-                    color: "white",
-                    border: "none",
-                    padding: "5px 10px",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                    marginTop: "5px",
-                    marginRight: "5px",
-                  }}
-                >
-                  Mark as Taken
-                </button>
-              )}
-              <button
-                onClick={() => deleteMedication(med.id)}
-                style={{
-                  backgroundColor: "#dc3545",
-                  color: "white",
-                  border: "none",
-                  padding: "5px 10px",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                  marginTop: "5px",
-                }}
-              >
-                Delete
-              </button>
-            </li>
-          ))
-        )}
-      </ul>
-
-      {showUpgrade && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100vw",
-            height: "100vh",
-            backgroundColor: "rgba(0,0,0,0.5)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: "#fff",
-              padding: "2rem",
-              borderRadius: "10px",
-              maxWidth: "400px",
-              textAlign: "center",
-            }}
+      {/* Search and Filter */}
+      <div className="medication-list__controls">
+        <Input
+          type="text"
+          placeholder="Search medications..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="medication-list__search"
+        />
+        <div className="medication-list__filters">
+          <button
+            className={`filter-btn ${filterStatus === "all" ? "filter-btn--active" : ""}`}
+            onClick={() => setFilterStatus("all")}
           >
-            <h3>Upgrade to Premium 💳</h3>
-            <p>Free plan allows only 3 medications. Upgrade for unlimited access!</p>
-            <button
-              onClick={handleUpgrade}
-              style={{
-                backgroundColor: "#007bff",
-                color: "#fff",
-                border: "none",
-                padding: "10px 15px",
-                borderRadius: "5px",
-                cursor: "pointer",
-                marginRight: "10px",
-              }}
-            >
-              Upgrade Now
-            </button>
-            <button
-              onClick={() => setShowUpgrade(false)}
-              style={{
-                backgroundColor: "#dc3545",
-                color: "#fff",
-                border: "none",
-                padding: "10px 15px",
-                borderRadius: "5px",
-                cursor: "pointer",
-              }}
-            >
-              Cancel
-            </button>
+            All
+          </button>
+          <button
+            className={`filter-btn ${filterStatus === "pending" ? "filter-btn--active" : ""}`}
+            onClick={() => setFilterStatus("pending")}
+          >
+            Pending
+          </button>
+          <button
+            className={`filter-btn ${filterStatus === "taken" ? "filter-btn--active" : ""}`}
+            onClick={() => setFilterStatus("taken")}
+          >
+            Taken
+          </button>
+        </div>
+      </div>
+
+      {/* Medication Cards */}
+      <div className="medication-cards">
+        {filteredMedications.length === 0 ? (
+          <div className="empty-state">
+            <div className="empty-state__icon">💊</div>
+            <h3 className="empty-state__title">{t('no_meds')}</h3>
+            <p className="empty-state__description">
+              {searchQuery || filterStatus !== "all" 
+                ? "No medications match your search or filter."
+                : "Add your first medication to get started."}
+            </p>
+          </div>
+        ) : (
+          filteredMedications.map((med) => {
+            const isExpanded = expandedCards.has(med.id);
+            const progress = med.taken ? 100 : 0;
+
+            return (
+              <Card 
+                key={med.id} 
+                className={`medication-card ${med.taken ? "medication-card--taken" : ""}`}
+              >
+                <div className="medication-card__header">
+                  <div className="medication-card__info">
+                    <h3 className="medication-card__name">{med.name}</h3>
+                    <p className="medication-card__dosage">{med.dosage}</p>
+                  </div>
+                  <Badge variant={med.taken ? "success" : "warning"}>
+                    {med.taken ? "Taken" : "Pending"}
+                  </Badge>
+                </div>
+
+                <div className="medication-card__progress">
+                  <ProgressBar value={progress} max={100} />
+                </div>
+
+                <div className="medication-card__details">
+                  <div className="medication-card__time">
+                    <span className="medication-card__label">Time:</span>
+                    <span className="medication-card__value">{med.time || "Not set"}</span>
+                  </div>
+                  {med.taken && med.takenAt && (
+                    <div className="medication-card__taken-time">
+                      <span className="medication-card__label">{t('taken_at')}:</span>
+                      <span className="medication-card__value">{med.takenAt}</span>
+                    </div>
+                  )}
+                </div>
+
+                {isExpanded && (
+                  <div className="medication-card__expanded">
+                    <div className="medication-card__meta">
+                      <p><strong>Added:</strong> {new Date(med.id).toLocaleDateString()}</p>
+                      <p><strong>Status:</strong> {med.taken ? "Completed" : "Pending"}</p>
+                    </div>
+                  </div>
+                )}
+
+                <div className="medication-card__actions">
+                  {!med.taken && (
+                    <Button
+                      variant="primary"
+                      size="small"
+                      onClick={() => markAsTaken(med.id)}
+                      fullWidth
+                    >
+                      {t('mark_as_taken')}
+                    </Button>
+                  )}
+                  <Button
+                    variant="secondary"
+                    size="small"
+                    onClick={() => toggleCardExpansion(med.id)}
+                  >
+                    {isExpanded ? "Show Less" : "Show More"}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="small"
+                    onClick={() => deleteMedication(med.id)}
+                  >
+                    {t('delete')}
+                  </Button>
+                </div>
+              </Card>
+            );
+          })
+        )}
+      </div>
+
+      {/* Upgrade Modal */}
+      {showUpgrade && (
+        <div className="upgrade-modal">
+          <div className="upgrade-modal__backdrop" onClick={() => setShowUpgrade(false)} />
+          <div className="upgrade-modal__content">
+            <h3 className="upgrade-modal__title">{t('upgrade_to_premium_modal')}</h3>
+            <p className="upgrade-modal__description">{t('free_plan_limit_modal')}</p>
+            <div className="upgrade-modal__actions">
+              <Button
+                variant="primary"
+                onClick={handleUpgrade}
+              >
+                {t('upgrade_now')}
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => setShowUpgrade(false)}
+              >
+                {t('cancel')}
+              </Button>
+            </div>
           </div>
         </div>
       )}

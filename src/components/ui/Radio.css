@@ -1,0 +1,250 @@
+/**
+ * Radio Component Styles
+ * Mobile-first design with wellness theme
+ */
+
+.radio-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+/* ============================================
+   LABEL WRAPPER
+   ============================================ */
+
+.radio__label-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  cursor: pointer;
+  /* Mobile-first: Ensure adequate touch target */
+  min-height: 44px;
+  padding: var(--space-2) 0;
+}
+
+.radio-wrapper--disabled .radio__label-wrapper {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ============================================
+   NATIVE RADIO (Hidden)
+   ============================================ */
+
+.radio {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* ============================================
+   CUSTOM RADIO
+   ============================================ */
+
+.radio__custom {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--neutral-0);
+  border: 2px solid var(--neutral-300);
+  border-radius: var(--radius-full);
+  transition: all var(--transition-base) var(--ease-in-out);
+}
+
+/* Sizes */
+.radio--sm + .radio__custom {
+  width: 18px;
+  height: 18px;
+}
+
+.radio--md + .radio__custom {
+  width: 22px;
+  height: 22px;
+}
+
+.radio--lg + .radio__custom {
+  width: 26px;
+  height: 26px;
+}
+
+/* ============================================
+   RADIO DOT
+   ============================================ */
+
+.radio__dot {
+  width: 50%;
+  height: 50%;
+  background: var(--neutral-0);
+  border-radius: var(--radius-full);
+  opacity: 0;
+  transform: scale(0);
+  transition: all var(--transition-fast) var(--ease-out);
+}
+
+/* ============================================
+   CHECKED STATE
+   ============================================ */
+
+.radio:checked + .radio__custom {
+  background: var(--primary-500);
+  border-color: var(--primary-500);
+}
+
+.radio:checked + .radio__custom .radio__dot {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ============================================
+   FOCUS STATE
+   ============================================ */
+
+.radio:focus-visible + .radio__custom {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* ============================================
+   HOVER STATE
+   ============================================ */
+
+.radio__label-wrapper:hover .radio:not(:disabled) + .radio__custom {
+  border-color: var(--primary-400);
+}
+
+.radio__label-wrapper:hover .radio:checked:not(:disabled) + .radio__custom {
+  background: var(--primary-600);
+  border-color: var(--primary-600);
+}
+
+/* ============================================
+   DISABLED STATE
+   ============================================ */
+
+.radio:disabled + .radio__custom {
+  background: var(--neutral-100);
+  border-color: var(--neutral-300);
+  cursor: not-allowed;
+}
+
+.radio:checked:disabled + .radio__custom {
+  background: var(--neutral-400);
+  border-color: var(--neutral-400);
+}
+
+/* ============================================
+   ERROR STATE
+   ============================================ */
+
+.radio-wrapper--error .radio__custom {
+  border-color: var(--error);
+}
+
+.radio-wrapper--error .radio:checked + .radio__custom {
+  background: var(--error);
+  border-color: var(--error);
+}
+
+.radio__error {
+  font-size: var(--text-sm);
+  color: var(--error);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-left: calc(22px + var(--space-3)); /* Align with label */
+}
+
+.radio__error::before {
+  content: '⚠';
+  font-size: var(--text-base);
+}
+
+/* ============================================
+   LABEL TEXT
+   ============================================ */
+
+.radio__label {
+  font-size: var(--text-base);
+  color: var(--neutral-800);
+  user-select: none;
+  line-height: var(--line-height-normal);
+}
+
+.radio-wrapper--disabled .radio__label {
+  color: var(--neutral-500);
+}
+
+/* ============================================
+   HELPER TEXT
+   ============================================ */
+
+.radio__helper-text {
+  font-size: var(--text-sm);
+  color: var(--neutral-600);
+  margin-left: calc(22px + var(--space-3)); /* Align with label */
+}
+
+/* ============================================
+   RADIO GROUP
+   ============================================ */
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.radio-group--horizontal {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+/* Mobile: Stack horizontal groups on small screens */
+@media (max-width: 639px) {
+  .radio-group--horizontal {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+/* Tablet and up: Slightly smaller touch targets acceptable */
+@media (min-width: 768px) {
+  .radio__label-wrapper {
+    min-height: 32px;
+  }
+}
+
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .radio__custom,
+  .radio__dot {
+    transition: none;
+  }
+}
+
+/* ============================================
+   PRINT
+   ============================================ */
+
+@media print {
+  .radio__custom {
+    border: 1px solid #000;
+  }
+  
+  .radio:checked + .radio__custom {
+    background: #000;
+  }
+}

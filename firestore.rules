@@ -1,15 +1,120 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // users' own documents
-    match /users/{userId}/{doc=**} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
     }
-    // organizations collection - limited access to org admins (example)
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function hasValidTimestamp() {
+      return request.resource.data.updatedAt == request.time;
+    }
+    
+    function isHealthcareProvider() {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/healthcare_providers/$(request.auth.uid));
+    }
+    
+    function isValidEmail(email) {
+      return email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$');
+    }
+    
+    function isValidMedication(data) {
+      return data.keys().hasAll(['name', 'dosage', 'frequency', 'userId', 'createdAt']) &&
+        data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+        data.dosage is string && data.dosage.size() > 0 && data.dosage.size() <= 50 &&
+        data.frequency is number && data.frequency > 0 && data.frequency <= 24 &&
+        data.userId is string && data.userId == request.auth.uid &&
+        data.createdAt is timestamp;
+    }
+    
+    function isValidADRReport(data) {
+      return data.keys().hasAll(['medicationName', 'symptoms', 'severity', 'userId', 'createdAt']) &&
+        data.medicationName is string && data.medicationName.size() > 0 &&
+        data.symptoms is string && data.symptoms.size() >= 10 &&
+        data.severity in ['mild', 'moderate', 'severe'] &&
+        data.userId is string && data.userId == request.auth.uid &&
+        data.createdAt is timestamp;
+    }
+    
+    // Users collection - user profile and settings
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isAuthenticated() && 
+                      request.auth.uid == userId &&
+                      request.resource.data.email is string &&
+                      isValidEmail(request.resource.data.email);
+      allow update: if isOwner(userId) && hasValidTimestamp();
+      allow delete: if isOwner(userId);
+    }
+    
+    // Medications collection - user's medication data
+    match /medications/{medicationId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && isValidMedication(request.resource.data);
+      allow update: if isAuthenticated() && 
+                      resource.data.userId == request.auth.uid &&
+                      isValidMedication(request.resource.data) &&
+                      hasValidTimestamp();
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+    
+    // ADR Reports collection - adverse drug reaction reports
+    // Users can write their own reports, healthcare providers can read all
+    match /adrReports/{adrId} {
+      allow read: if isAuthenticated() && 
+                    (resource.data.userId == request.auth.uid || isHealthcareProvider());
+      allow create: if isAuthenticated() && isValidADRReport(request.resource.data);
+      allow update: if isAuthenticated() && 
+                      resource.data.userId == request.auth.uid &&
+                      isValidADRReport(request.resource.data) &&
+                      hasValidTimestamp();
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+    
+    // Adherence History collection - daily adherence tracking
+    match /adherenceHistory/{historyId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && 
+                      request.resource.data.userId == request.auth.uid &&
+                      request.resource.data.keys().hasAll(['userId', 'date', 'adherenceRate', 'createdAt']);
+      allow update: if isAuthenticated() && 
+                      resource.data.userId == request.auth.uid &&
+                      request.resource.data.userId == request.auth.uid;
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+    
+    // Analytics collection - aggregated data for healthcare providers only
+    match /analytics/{document=**} {
+      allow read: if isHealthcareProvider();
+      allow write: if false; // Analytics are computed server-side only
+    }
+    
+    // Healthcare providers registry - read-only for authenticated providers
+    match /healthcare_providers/{providerId} {
+      allow read: if isAuthenticated() && isOwner(providerId);
+      allow write: if false; // Only admin can modify
+    }
+    
+    // Audit logs - system access only
+    match /audit_logs/{logId} {
+      allow read, write: if false; // System access only
+    }
+    
+    // Organizations collection - for NGOs, clinics, hospitals
     match /organizations/{orgId} {
-      // allow read to authenticated users (only aggregated data) - adjust as needed
-      allow read: if request.auth != null;
-      allow write: if false;
+      allow read: if isAuthenticated();
+      allow write: if false; // Managed by admins only
+    }
+    
+    // Deny all other access by default
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

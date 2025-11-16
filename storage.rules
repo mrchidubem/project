@@ -1,0 +1,41 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isValidImageFile() {
+      return request.resource.contentType.matches('image/.*');
+    }
+    
+    function isValidFileSize() {
+      // Max 5MB for images
+      return request.resource.size < 5 * 1024 * 1024;
+    }
+    
+    // ADR report photos - user can only access their own photos
+    match /adr-photos/{userId}/{photoId} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId) && 
+                     isValidImageFile() && 
+                     isValidFileSize();
+      allow delete: if isOwner(userId);
+    }
+    
+    // User profile photos (optional future feature)
+    match /profile-photos/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId) && 
+                     isValidImageFile() && 
+                     isValidFileSize();
+      allow delete: if isOwner(userId);
+    }
+  }
+}
