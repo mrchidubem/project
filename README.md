@@ -32,16 +32,18 @@ This project was collaboratively developed by:
 
 - **[VeeCC-T](https://github.com/VeeCC-T)** - Lead Developer & Project Architect
   - Project architecture and planning
+  - Full-stack development
   - Firebase infrastructure setup
   - Core feature development
-  - Database design and implementation
+   - Payment system implementation
+  
 
 - **[Cedar-Creatives](https://github.com/Cedar-Creatives)** - Co-Developer & Full-Stack Engineer
-  - Full-stack development
+  - Database design and implementation
   - Security implementation
   - UI/UX design and implementation
   - Feature development and integration
-  - Payment system implementation
+ 
   - Multi-language support
   - Testing and quality assurance
 
