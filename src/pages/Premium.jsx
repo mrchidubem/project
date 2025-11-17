@@ -1,184 +1,107 @@
 import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { loadStripe } from "@stripe/stripe-js";
+import { Button, Card, Alert } from "../ui";
 import usageLimiter from "../utils/usageLimiter.js";
-import onboardingManager from "../utils/onboardingManager.js";
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 const Premium = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [usageStats, setUsageStats] = useState(null);
-  const [searchParams] = useSearchParams();
-
-  const handleStartTutorial = () => {
-    onboardingManager.startManualTutorial();
-    // Dispatch custom event to trigger onboarding without page reload
-    window.dispatchEvent(new CustomEvent('restartOnboarding'));
-  };
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    // Check for Paystack success callback
-    const paymentStatus = searchParams.get('status');
-    const reference = searchParams.get('reference');
-    
-    if (paymentStatus === 'success' && reference) {
-      handlePaystackSuccess(reference);
-    }
-    
-    // Load usage statistics when component mounts
     const stats = usageLimiter.getUsageStats();
     setUsageStats(stats);
-  }, [searchParams]);
+  }, []);
 
-  const handlePayment = () => {
-    // Simulate Paystack test checkout with return URL
-    const returnUrl = `${window.location.origin}/premium?status=success&reference=test_${Date.now()}`;
-    window.location.href = `https://paystack.com/pay/testcheckout?callback_url=${encodeURIComponent(returnUrl)}`;
-  };
+  const handleStripeCheckout = async () => {
+    setLoading(true);
+    setError("");
 
-  /**
-   * Handle successful Paystack payment callback
-   * - Update premium status in usageLimiter
-   * - Clear usage limitations for newly premium users
-   * - Preserve existing data during status transitions
-   */
-  const handlePaystackSuccess = (reference) => {
     try {
-      // Set premium status with 30-day expiry (monthly subscription)
-      const expiryDate = new Date();
-      expiryDate.setMonth(expiryDate.getMonth() + 1);
+      const stripe = await stripePromise;
       
-      // Update premium status - this preserves existing medication/ADR data
-      usageLimiter.setPremiumStatus(expiryDate);
-      
-      // Refresh usage stats to reflect premium status
-      const updatedStats = usageLimiter.getUsageStats();
-      setUsageStats(updatedStats);
-      
-      console.log("Paystack payment successful - premium status updated", { reference });
-      
-      // Show success message
-      alert(t('payment_successful'));
-      
-      // Clean up URL parameters
-      window.history.replaceState({}, document.title, window.location.pathname);
-      
+      if (!stripe) {
+        throw new Error("Stripe failed to load");
+      }
+
+      // Redirect to Stripe Checkout (client-side)
+      const { error } = await stripe.redirectToCheckout({
+        lineItems: [{ price: import.meta.env.VITE_STRIPE_PRICE_ID, quantity: 1 }],
+        mode: 'subscription',
+        successUrl: `${window.location.origin}/premium?success=true`,
+        cancelUrl: `${window.location.origin}/premium?canceled=true`,
+      });
+
+      if (error) {
+        setError(error.message);
+      }
     } catch (err) {
-      console.error("Failed to update premium status after Paystack success:", err);
-      alert(t('payment_issue'));
+      setError(err.message || "Payment failed");
+    } finally {
+      setLoading(false);
     }
   };
 
   if (!usageStats) {
-    return <div style={{ padding: "1rem", textAlign: "center" }}>{t('loading')}</div>;
+    return <div style={{ padding: "2rem", textAlign: "center" }}>{t('loading')}</div>;
   }
 
   return (
-    <div style={{ padding: "1rem", textAlign: "center" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-        <h2 style={{ margin: 0 }}>{t('upgrade_to_premium')} 🌟</h2>
-        <button
-          onClick={handleStartTutorial}
-          style={{
-            backgroundColor: "#6c757d",
-            color: "#fff",
-            border: "none",
-            padding: "8px 16px",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontSize: "0.9rem",
-            fontWeight: "500"
-          }}
-          title={t('tutorial_help')}
-        >
-          {t('replay_tutorial')} 🎓
-        </button>
-      </div>
-      
-      {/* Usage Status Display */}
-      <div style={{
-        backgroundColor: "#f8f9fa",
-        border: "1px solid #dee2e6",
-        borderRadius: "8px",
-        padding: "1rem",
-        margin: "1rem 0",
-        textAlign: "left"
-      }}>
-        <h3 style={{ margin: "0 0 0.5rem 0", color: "#495057" }}>{t('your_current_usage')}</h3>
+    <div style={{ padding: "2rem", maxWidth: "600px", margin: "0 auto" }}>
+      <h1 style={{ marginBottom: "1rem" }}>🌟 {t('upgrade_to_premium')}</h1>
+
+      {error && <Alert variant="error" style={{ marginBottom: "1rem" }}>{error}</Alert>}
+
+      <Card style={{ padding: "1.5rem", marginBottom: "1rem" }}>
+        <h3 style={{ margin: "0 0 1rem 0" }}>{t('your_current_usage')}</h3>
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
           <span>{t('medications')}:</span>
-          <span style={{ fontWeight: "bold" }}>
-            {usageStats.medicationCount}
-            {usageStats.medicationLimit ? ` / ${usageStats.medicationLimit}` : ` (${t('unlimited')})`}
-          </span>
+          <strong>{usageStats.medicationCount} / {usageStats.medicationLimit || '∞'}</strong>
         </div>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <span>{t('adr_reports')}:</span>
-          <span style={{ fontWeight: "bold" }}>
-            {usageStats.adrCount}
-            {usageStats.adrLimit ? ` / ${usageStats.adrLimit}` : ` (${t('unlimited')})`}
-          </span>
+          <strong>{usageStats.adrCount} / {usageStats.adrLimit || '∞'}</strong>
         </div>
-        {!usageStats.isPremium && (
-          <p style={{ 
-            margin: "0.5rem 0 0 0", 
-            fontSize: "0.9rem", 
-            color: "#6c757d",
-            fontStyle: "italic" 
-          }}>
-            {t('free_users_limited')}
-          </p>
-        )}
-      </div>
-
-      {/* Premium Benefits Messaging */}
-      <div style={{ margin: "1rem 0" }}>
-        <p>
-          {t('unlock_unlimited')}
-          {!usageStats.isPremium && ` ${t('track_health_needs')}`}!
-        </p>
-        <p style={{ color: "#6c757d", fontSize: "0.9rem" }}>
-          {t('plus_cloud_sync')}
-        </p>
-      </div>
+      </Card>
 
       {usageStats.isPremium ? (
-        <div style={{
-          backgroundColor: "#d4edda",
-          border: "1px solid #c3e6cb",
-          borderRadius: "8px",
-          padding: "1rem",
-          color: "#155724"
-        }}>
-          <h3 style={{ margin: "0 0 0.5rem 0" }}>🎉 {t('youre_premium')}</h3>
-          <p style={{ margin: 0 }}>
-            {t('enjoy_unlimited')}
-            {usageStats.premiumExpiry && (
-              <span style={{ display: "block", fontSize: "0.9rem", marginTop: "0.5rem" }}>
-                {t('premium_expires')} {new Date(usageStats.premiumExpiry).toLocaleDateString()}
-              </span>
-            )}
-          </p>
-        </div>
+        <Card style={{ padding: "1.5rem", backgroundColor: "#d4edda", border: "1px solid #c3e6cb" }}>
+          <h3 style={{ margin: "0 0 0.5rem 0", color: "#155724" }}>🎉 {t('youre_premium')}</h3>
+          <p style={{ margin: 0, color: "#155724" }}>{t('enjoy_unlimited')}</p>
+        </Card>
       ) : (
         <>
-          <h3>₦2,500 / {t('monthly_subscription')}</h3>
-          <button
-            onClick={handlePayment}
-            style={{
-              backgroundColor: "#28a745",
-              color: "#fff",
-              border: "none",
-              padding: "12px 20px",
-              borderRadius: "8px",
-              cursor: "pointer",
-              fontSize: "1rem",
-            }}
-          >
-            {t('pay_with_paystack')}
-          </button>
-          <p style={{ marginTop: "1rem", color: "#555" }}>
-            {t('secure_checkout')} powered by Paystack.
-          </p>
+          <Card style={{ padding: "1.5rem", marginBottom: "1rem" }}>
+            <h3 style={{ margin: "0 0 1rem 0" }}>Premium Benefits</h3>
+            <ul style={{ margin: 0, paddingLeft: "1.5rem" }}>
+              <li>Unlimited medications</li>
+              <li>Unlimited ADR reports</li>
+              <li>Priority support</li>
+              <li>Advanced analytics</li>
+            </ul>
+          </Card>
+
+          <div style={{ textAlign: "center" }}>
+            <h2 style={{ margin: "1rem 0" }}>$4.99/month</h2>
+            <Button
+              onClick={handleStripeCheckout}
+              variant="primary"
+              loading={loading}
+              disabled={loading}
+              style={{ padding: "1rem 2rem", fontSize: "1.1rem" }}
+            >
+              Subscribe with Stripe
+            </Button>
+            <p style={{ marginTop: "1rem", color: "#666", fontSize: "0.9rem" }}>
+              Secure checkout powered by Stripe
+            </p>
+          </div>
         </>
       )}
     </div>
