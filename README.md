@@ -19,10 +19,10 @@
 
 ### Academic Context
 
-This project was developed as a capstone requirement for the **AI Software Engineering Certification** program at **PowerLane Project PMP**. The application demonstrates proficiency in modern web development, AI-assisted development workflows, cloud infrastructure, and healthcare software engineering principles.
+This project was developed as a capstone requirement for the **Artificial Intelligence in Software Engineering Certificate** program at **Power Learn Project Africa**. The application demonstrates proficiency in modern web development, AI-assisted development workflows, cloud infrastructure, and healthcare software engineering principles.
 
-**Institution**: PowerLane Project PMP  
-**Program**: AI Software Engineering Certification  
+**Institution**: Power Learn Project Africa  
+**Program**: Artificial Intelligence in Software Engineering Certificate  
 **Project Type**: Capstone Project  
 **Completion Date**: November 2025
 
@@ -345,8 +345,8 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file.
 
 ## 🎓 Academic Information
 
-**Program**: AI Software Engineering Certification  
-**Institution**: PowerLane Project PMP  
+**Program**: Artificial Intelligence in Software Engineering Certificate  
+**Institution**: Power Learn Project Africa  
 **Project Type**: Capstone/Certification Project  
 **Technologies Demonstrated**: 
 - Progressive Web Apps (PWA)
@@ -361,7 +361,7 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file.
 
 ## 🙏 Acknowledgments
 
-- **PowerLane Project PMP** for providing the AI Software Engineering certification program
+- **Power Learn Project Africa** for providing the Artificial Intelligence in Software Engineering certificate program
 - **Firebase** for backend infrastructure and hosting
 - **OpenStreetMap** for free pharmacy location data
 - **React Community** for excellent tools and libraries
@@ -384,7 +384,7 @@ If you use this project for academic or research purposes, please cite:
 
 ```
 VeeCC-T & Cedar-Creatives. (2025). MedAdhere: Medication Adherence Tracker. 
-PowerLane Project PMP AI Software Engineering Certification Capstone Project.
+Power Learn Project Africa - Artificial Intelligence in Software Engineering Certificate Capstone Project.
 https://github.com/VeeCC-T/MedAdhere
 ```
 
