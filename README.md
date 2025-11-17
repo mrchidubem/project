@@ -31,12 +31,15 @@ This project was developed as a capstone requirement for the **Artificial Intell
 This project was collaboratively developed by:
 
 - **[VeeCC-T](https://github.com/VeeCC-T)** - Lead Developer & Project Architect
-  - Full-stack development
+  - Project architecture and planning
   - Firebase infrastructure setup
+  - Core feature development
+  - Database design and implementation
+
+- **[Cedar-Creatives](https://github.com/Cedar-Creatives)** - Co-Developer & Full-Stack Engineer
+  - Full-stack development
   - Security implementation
   - UI/UX design and implementation
-
-- **[Cedar-Creatives](https://github.com/Cedar-Creatives)** - Co-Developer & Feature Engineer
   - Feature development and integration
   - Payment system implementation
   - Multi-language support
@@ -338,8 +341,8 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file.
 
 ### Contributions
 
-- **VeeCC-T**: Project architecture, Firebase setup, core features, security implementation, UI/UX design
-- **Cedar-Creatives**: Feature development, payment integration, internationalization, testing, deployment
+- **VeeCC-T**: Project architecture, Firebase infrastructure, database design, core feature development
+- **Cedar-Creatives**: Full-stack development, security implementation, UI/UX design, payment integration, internationalization, testing, deployment
 
 ---
 
