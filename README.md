@@ -15,9 +15,42 @@
 
 ---
 
+## 📋 Project Information
+
+### Academic Context
+
+This project was developed as a capstone requirement for the **AI Software Engineering Certification** program at **PowerLane Project PMP**. The application demonstrates proficiency in modern web development, AI-assisted development workflows, cloud infrastructure, and healthcare software engineering principles.
+
+**Institution**: PowerLane Project PMP  
+**Program**: AI Software Engineering Certification  
+**Project Type**: Capstone Project  
+**Completion Date**: November 2025
+
+### Development Team
+
+This project was collaboratively developed by:
+
+- **[VeeCC-T](https://github.com/VeeCC-T)** - Lead Developer & Project Architect
+  - Full-stack development
+  - Firebase infrastructure setup
+  - Security implementation
+  - UI/UX design and implementation
+
+- **[Cedar-Creatives](https://github.com/Cedar-Creatives)** - Co-Developer & Feature Engineer
+  - Feature development and integration
+  - Payment system implementation
+  - Multi-language support
+  - Testing and quality assurance
+
+**Repository**: https://github.com/VeeCC-T/MedAdhere
+
+---
+
 ## 🌟 Overview
 
 MedAdhere is a comprehensive medication adherence tracking application designed to help patients manage their medications effectively. Built with healthcare compliance in mind, it features enterprise-grade security, multi-language support, and a beautiful, accessible user interface.
+
+This project showcases modern software engineering practices including Progressive Web App architecture, cloud-native development, AI-assisted coding workflows, and healthcare data security standards.
 
 ### Why MedAdhere?
 
@@ -276,21 +309,88 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file.
 
 ---
 
+## 👥 Contributors
+
+### Development Team
+
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/VeeCC-T">
+        <img src="https://github.com/VeeCC-T.png" width="100px;" alt="VeeCC-T"/>
+        <br />
+        <sub><b>VeeCC-T</b></sub>
+      </a>
+      <br />
+      <sub>Lead Developer</sub>
+    </td>
+    <td align="center">
+      <a href="https://github.com/Cedar-Creatives">
+        <img src="https://github.com/Cedar-Creatives.png" width="100px;" alt="Cedar-Creatives"/>
+        <br />
+        <sub><b>Cedar-Creatives</b></sub>
+      </a>
+      <br />
+      <sub>Co-Developer</sub>
+    </td>
+  </tr>
+</table>
+
+### Contributions
+
+- **VeeCC-T**: Project architecture, Firebase setup, core features, security implementation, UI/UX design
+- **Cedar-Creatives**: Feature development, payment integration, internationalization, testing, deployment
+
+---
+
+## 🎓 Academic Information
+
+**Program**: AI Software Engineering Certification  
+**Institution**: PowerLane Project PMP  
+**Project Type**: Capstone/Certification Project  
+**Technologies Demonstrated**: 
+- Progressive Web Apps (PWA)
+- Cloud-Native Development (Firebase)
+- AI-Assisted Development Workflows
+- Healthcare Software Engineering
+- Enterprise Security Practices
+- Multi-Language Application Development
+- Responsive Design & Accessibility
+
+---
+
 ## 🙏 Acknowledgments
 
-- Firebase for backend infrastructure
-- OpenStreetMap for free pharmacy data
-- React community for excellent tools
-- All contributors and testers
+- **PowerLane Project PMP** for providing the AI Software Engineering certification program
+- **Firebase** for backend infrastructure and hosting
+- **OpenStreetMap** for free pharmacy location data
+- **React Community** for excellent tools and libraries
+- **Stripe** for payment processing infrastructure
+- All instructors, mentors, and peers who provided guidance
 
 ---
 
-## 📞 Support
+## 📞 Support & Contact
 
-For support, email support@medadhere.com or open an issue.
+For questions, issues, or contributions:
+- Open an issue on [GitHub](https://github.com/VeeCC-T/MedAdhere/issues)
+- Contact: [VeeCC-T](https://github.com/VeeCC-T) or [Cedar-Creatives](https://github.com/Cedar-Creatives)
 
 ---
 
-**Built with ❤️ by Cedar Creatives**
+## 📜 Citation
 
-**Live Demo**: https://medadhere-bab59.web.app
+If you use this project for academic or research purposes, please cite:
+
+```
+VeeCC-T & Cedar-Creatives. (2025). MedAdhere: Medication Adherence Tracker. 
+PowerLane Project PMP AI Software Engineering Certification Capstone Project.
+https://github.com/VeeCC-T/MedAdhere
+```
+
+---
+
+**Built with ❤️ by VeeCC-T & Cedar-Creatives**
+
+**Live Demo**: https://medadhere-bab59.web.app  
+**Repository**: https://github.com/VeeCC-T/MedAdhere
