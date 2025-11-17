@@ -11,7 +11,6 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Card, ProgressBar, Button } from "./ui";
-import UpgradeModal from "./UpgradeModal";
 import usageLimiter from "../utils/usageLimiter.js";
 import onboardingManager from "../utils/onboardingManager";
 import "./Dashboard.css";
@@ -22,8 +21,6 @@ const Dashboard = () => {
   const [adherenceHistory, setAdherenceHistory] = useState({});
   const [medications, setMedications] = useState([]);
   const [adrReports, setAdrReports] = useState([]);
-  const [plan, setPlan] = useState("free");
-  const [showUpgrade, setShowUpgrade] = useState(false);
   const todayKey = new Date().toLocaleDateString();
   const [todayPercent, setTodayPercent] = useState(0);
   const [userName, setUserName] = useState("");
@@ -38,20 +35,19 @@ const Dashboard = () => {
     const savedHistory = JSON.parse(localStorage.getItem("adherenceHistory")) || {};
     const savedMeds = JSON.parse(localStorage.getItem("medications")) || [];
     const savedADRs = JSON.parse(localStorage.getItem("adrReports")) || [];
-    const savedPlan = localStorage.getItem("plan") || "free";
     const savedName = localStorage.getItem("userName") || "there";
 
     setAdherenceHistory(savedHistory);
     setMedications(savedMeds);
     setAdrReports(savedADRs);
-    setPlan(savedPlan);
     setUserName(savedName);
 
     // Compute today's adherence
     if (typeof savedHistory[todayKey] !== "undefined") {
       setTodayPercent(savedHistory[todayKey]);
     } else {
-      const allowed = savedPlan === "free" ? savedMeds.slice(0, 3) : savedMeds;
+      const isPremium = usageLimiter.isPremiumUser();
+      const allowed = isPremium ? savedMeds : savedMeds.slice(0, 3);
       const takenCount = allowed.filter((m) => m.taken).length;
       const pct = allowed.length === 0 ? 0 : Math.round((takenCount / allowed.length) * 100);
       setTodayPercent(pct);
@@ -64,25 +60,6 @@ const Dashboard = () => {
     localStorage.setItem("adherenceHistory", JSON.stringify(newHistory));
   };
 
-  // Handle premium upgrade
-  const handlePremiumUpgradeSuccess = () => {
-    try {
-      const expiryDate = new Date();
-      expiryDate.setMonth(expiryDate.getMonth() + 1);
-      usageLimiter.setPremiumStatus(expiryDate);
-    } catch (err) {
-      console.error("Failed to update premium status:", err);
-    }
-  };
-
-  const handleUpgrade = () => {
-    handlePremiumUpgradeSuccess();
-    localStorage.setItem("plan", "premium");
-    setPlan("premium");
-    setShowUpgrade(false);
-    alert("🎉 Upgrade successful! You're now on the Premium plan.");
-  };
-
   // Medication quick actions
   const markAsTaken = (id) => {
     const updated = medications.map((m) =>
@@ -91,7 +68,8 @@ const Dashboard = () => {
     setMedications(updated);
     localStorage.setItem("medications", JSON.stringify(updated));
 
-    const allowed = plan === "free" ? updated.slice(0, 3) : updated;
+    const isPremium = usageLimiter.isPremiumUser();
+    const allowed = isPremium ? updated : updated.slice(0, 3);
     const takenCount = allowed.filter((m) => m.taken).length;
     const percent = allowed.length === 0 ? 0 : Math.round((takenCount / allowed.length) * 100);
     setTodayPercent(percent);
@@ -128,7 +106,8 @@ const Dashboard = () => {
   };
 
   // Get today's medications
-  const todayMeds = plan === "free" ? medications.slice(0, 3) : medications;
+  const isPremium = usageLimiter.isPremiumUser();
+  const todayMeds = isPremium ? medications : medications.slice(0, 3);
   const takenToday = todayMeds.filter(m => m.taken).length;
   const upcomingMeds = todayMeds.filter(m => !m.taken).slice(0, 3);
 
@@ -334,18 +313,18 @@ const Dashboard = () => {
       )}
 
       {/* Premium Upgrade CTA */}
-      {plan === "free" && (
+      {!usageLimiter.isPremiumUser() && (
         <Card className="dashboard__premium">
           <div className="premium-cta">
             <div className="premium-cta__content">
-              <h3 className="premium-cta__title">Unlock Premium Features</h3>
+              <h3 className="premium-cta__title">🌟 Upgrade to Premium</h3>
               <p className="premium-cta__description">
                 Unlimited medications, advanced analytics, and more
               </p>
             </div>
             <Button
               variant="accent"
-              onClick={() => setShowUpgrade(true)}
+              onClick={() => navigate('/premium')}
             >
               Upgrade Now
             </Button>
@@ -353,11 +332,6 @@ const Dashboard = () => {
         </Card>
       )}
 
-      <UpgradeModal 
-        show={showUpgrade} 
-        onClose={() => setShowUpgrade(false)} 
-        onUpgrade={handleUpgrade} 
-      />
     </div>
   );
 };
