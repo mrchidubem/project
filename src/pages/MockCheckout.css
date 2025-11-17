@@ -1,0 +1,147 @@
+.mock-checkout {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.mock-checkout__container {
+  width: 100%;
+  max-width: 500px;
+}
+
+.mock-checkout__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 0 0.5rem;
+}
+
+.mock-checkout__logo svg {
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.1));
+}
+
+.mock-checkout__secure {
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mock-checkout__card {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.mock-checkout__summary {
+  text-align: center;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--neutral-200);
+  margin-bottom: 1.5rem;
+}
+
+.mock-checkout__summary h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  color: var(--neutral-900);
+}
+
+.mock-checkout__price {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.mock-checkout__price .amount {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary-500);
+}
+
+.mock-checkout__price .period {
+  font-size: 1rem;
+  color: var(--neutral-600);
+}
+
+.mock-checkout__description {
+  margin: 0;
+  color: var(--neutral-600);
+  font-size: 0.95rem;
+}
+
+.mock-checkout__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--neutral-700);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.mock-checkout__actions {
+  margin-top: 0.5rem;
+}
+
+.mock-checkout__footer {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--neutral-200);
+  text-align: center;
+}
+
+.mock-checkout__footer p {
+  margin: 0.5rem 0;
+  font-size: 0.85rem;
+  color: var(--neutral-600);
+}
+
+.mock-checkout__test-notice {
+  background: #fff3cd;
+  color: #856404;
+  padding: 0.5rem;
+  border-radius: 4px;
+  margin-top: 1rem !important;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .mock-checkout {
+    padding: 1rem;
+  }
+
+  .mock-checkout__card {
+    padding: 1.5rem;
+  }
+
+  .mock-checkout__price .amount {
+    font-size: 2rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}

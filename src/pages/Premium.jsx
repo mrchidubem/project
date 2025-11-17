@@ -1,11 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { loadStripe } from "@stripe/stripe-js";
 import { Button, Card, Alert } from "../components/ui";
 import usageLimiter from "../utils/usageLimiter.js";
-
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 const Premium = () => {
   const { t } = useTranslation();
@@ -43,33 +40,9 @@ const Premium = () => {
     }
   }, [searchParams, navigate]);
 
-  const handleStripeCheckout = async () => {
-    setLoading(true);
-    setError("");
-
-    try {
-      const stripe = await stripePromise;
-      
-      if (!stripe) {
-        throw new Error("Stripe failed to load");
-      }
-
-      // Redirect to Stripe Checkout (client-side)
-      const { error } = await stripe.redirectToCheckout({
-        lineItems: [{ price: import.meta.env.VITE_STRIPE_PRICE_ID, quantity: 1 }],
-        mode: 'subscription',
-        successUrl: `${window.location.origin}/premium?success=true`,
-        cancelUrl: `${window.location.origin}/premium?canceled=true`,
-      });
-
-      if (error) {
-        setError(error.message);
-      }
-    } catch (err) {
-      setError(err.message || "Payment failed");
-    } finally {
-      setLoading(false);
-    }
+  const handleStripeCheckout = () => {
+    // Navigate to mock checkout page
+    navigate('/checkout');
   };
 
   if (!usageStats) {

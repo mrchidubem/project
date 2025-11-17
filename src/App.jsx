@@ -20,6 +20,7 @@ import { Header, BottomNav, Sidebar } from "./components/Navigation";
 // Pages
 import PaymentPage from "./pages/PaymentPage.jsx";
 import Premium from "./pages/Premium.jsx";
+import MockCheckout from "./pages/MockCheckout.jsx";
 import Upgrade from "./pages/Upgrade.jsx";
 import PrivacySettings from "./pages/PrivacySettings.jsx";
 import Settings from "./pages/Settings.jsx";
@@ -152,6 +153,14 @@ const App = () => {
                 element={
                   <PrivateRoute user={user} loading={authLoading}>
                     <Premium />
+                  </PrivateRoute>
+                } 
+              />
+              <Route 
+                path="/checkout" 
+                element={
+                  <PrivateRoute user={user} loading={authLoading}>
+                    <MockCheckout />
                   </PrivateRoute>
                 } 
               />
