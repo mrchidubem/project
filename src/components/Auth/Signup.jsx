@@ -24,8 +24,10 @@ const Signup = () => {
       return false;
     }
 
-    if (password.length < 6) {
-      setError(t("auth_password_too_short"));
+    // Validate password complexity (matching securityUtils requirements)
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!passwordRegex.test(password)) {
+      setError("Password must be at least 8 characters and include uppercase, lowercase, number, and special character (@$!%*?&)");
       return false;
     }
 
@@ -125,19 +127,27 @@ const Signup = () => {
             <div className="form-group">
               <label className="form-label">{t("auth_password")}</label>
               <Input
-                type="password"
+                type="text"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder={t("auth_password_placeholder")}
                 disabled={loading}
               />
-              <p className="form-helper-text">{t("auth_password_requirements")}</p>
+              <div style={{ marginTop: '8px', fontSize: '12px', color: '#666', lineHeight: '1.4' }}>
+                <p style={{ margin: '0 0 4px 0', fontWeight: '500' }}>Password requirements:</p>
+                <ul style={{ margin: '0', paddingLeft: '16px', listStyle: 'disc' }}>
+                  <li>At least 8 characters long</li>
+                  <li>Contains uppercase and lowercase letters</li>
+                  <li>Contains at least one number</li>
+                  <li>Contains at least one special character (@$!%*?&)</li>
+                </ul>
+              </div>
             </div>
 
             <div className="form-group">
               <label className="form-label">{t("auth_confirm_password")}</label>
               <Input
-                type="password"
+                type="text"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder={t("auth_confirm_password_placeholder")}

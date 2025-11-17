@@ -178,26 +178,26 @@ class AuthService {
       // Create user document in Firestore
       await this._createUserDocument(userCredential.user, additionalData);
 
-      // Log successful signup
-      await securityUtils.auditLogger.log(
+      // Log successful signup (non-blocking)
+      securityUtils.auditLogger.log(
         'SIGNUP_SUCCESS',
         'authentication',
         userCredential.user.uid,
         { email, displayName: additionalData.displayName }
-      );
+      ).catch(err => console.error('Audit log error:', err));
 
       return {
         user: userCredential.user,
         emailVerificationSent: true
       };
     } catch (error) {
-      // Log failed signup
-      await securityUtils.auditLogger.log(
+      // Log failed signup (non-blocking)
+      securityUtils.auditLogger.log(
         'SIGNUP_FAILED',
         'authentication',
         null,
         { email, error: error.message }
-      );
+      ).catch(err => console.error('Audit log error:', err));
 
       console.error('Sign up error:', error);
       throw this._handleAuthError(error);
@@ -245,23 +245,23 @@ class AuthService {
       // Clear failed attempts on success
       securityUtils.rateLimiter.clear(rateLimitKey);
 
-      // Log successful login
-      await securityUtils.auditLogger.log(
+      // Log successful login (non-blocking)
+      securityUtils.auditLogger.log(
         'LOGIN_SUCCESS',
         'authentication',
         userCredential.user.uid,
         { email }
-      );
+      ).catch(err => console.error('Audit log error:', err));
 
       return userCredential.user;
     } catch (error) {
-      // Log failed login attempt
-      await securityUtils.auditLogger.log(
+      // Log failed login attempt (non-blocking)
+      securityUtils.auditLogger.log(
         'LOGIN_FAILED',
         'authentication',
         null,
         { email, error: error.message }
-      );
+      ).catch(err => console.error('Audit log error:', err));
 
       console.error('Sign in error:', error);
       throw this._handleAuthError(error);
@@ -286,13 +286,35 @@ class AuthService {
       );
 
       const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({
+        prompt: 'select_account'
+      });
+      
       const userCredential = await signInWithPopup(this.auth, provider);
 
-      // Create user document if it doesn't exist
-      await this._createUserDocument(userCredential.user);
+      // Create user document if it doesn't exist (non-blocking)
+      this._createUserDocument(userCredential.user).catch(err => {
+        console.error('Error creating user document:', err);
+      });
+
+      // Log successful Google sign-in (non-blocking)
+      securityUtils.auditLogger.log(
+        'GOOGLE_SIGNIN_SUCCESS',
+        'authentication',
+        userCredential.user.uid,
+        { email: userCredential.user.email }
+      ).catch(err => console.error('Audit log error:', err));
 
       return userCredential.user;
     } catch (error) {
+      // Log failed Google sign-in (non-blocking)
+      securityUtils.auditLogger.log(
+        'GOOGLE_SIGNIN_FAILED',
+        'authentication',
+        null,
+        { error: error.message }
+      ).catch(err => console.error('Audit log error:', err));
+
       console.error('Google sign in error:', error);
       throw this._handleAuthError(error);
     }
@@ -316,13 +338,13 @@ class AuthService {
       // Clear session data
       sessionStorage.clear();
 
-      // Log logout
+      // Log logout (non-blocking)
       if (userId) {
-        await securityUtils.auditLogger.log(
+        securityUtils.auditLogger.log(
           'LOGOUT_SUCCESS',
           'authentication',
           userId
-        );
+        ).catch(err => console.error('Audit log error:', err));
       }
     } catch (error) {
       console.error('Sign out error:', error);
@@ -355,21 +377,21 @@ class AuthService {
 
       await sendPasswordResetEmail(this.auth, email);
 
-      // Log password reset request
-      await securityUtils.auditLogger.log(
+      // Log password reset request (non-blocking)
+      securityUtils.auditLogger.log(
         'PASSWORD_RESET_REQUESTED',
         'authentication',
         null,
         { email }
-      );
+      ).catch(err => console.error('Audit log error:', err));
     } catch (error) {
-      // Log failed password reset
-      await securityUtils.auditLogger.log(
+      // Log failed password reset (non-blocking)
+      securityUtils.auditLogger.log(
         'PASSWORD_RESET_FAILED',
         'authentication',
         null,
         { email, error: error.message }
-      );
+      ).catch(err => console.error('Audit log error:', err));
 
       console.error('Password reset error:', error);
       throw this._handleAuthError(error);

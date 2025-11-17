@@ -371,9 +371,6 @@ const PharmacyFinder = () => {
               onChange={(e) => handleRadiusChange(parseInt(e.target.value, 10))}
               disabled={loading}
             >
-              <option value="" disabled>
-                {t("select_radius") || "Select radius"}
-              </option>
               {RADIUS_OPTIONS.map((radius) => (
                 <option key={radius} value={radius}>
                   {radius} km
@@ -515,8 +512,17 @@ const PharmacyFinder = () => {
 
           <div className="pharmacy-list">
             {pharmacies.map((pharmacy, index) => {
-              const pharmacyName = pharmacy.name;
-              const address = pharmacy.vicinity || pharmacy.formatted_address || "Address not available";
+              const pharmacyName = pharmacy.name || "Pharmacy";
+              // OpenStreetMap returns address in tags
+              const address = pharmacy.vicinity || 
+                             pharmacy.formatted_address || 
+                             (pharmacy.tags ? 
+                               [
+                                 pharmacy.tags["addr:housenumber"],
+                                 pharmacy.tags["addr:street"],
+                                 pharmacy.tags["addr:city"]
+                               ].filter(Boolean).join(", ") : null) ||
+                             "Address not available";
               
               const isOpenNow = pharmacy.opening_hours?.open_now;
               const rating = pharmacy.rating;
@@ -565,17 +571,20 @@ const PharmacyFinder = () => {
                     </div>
 
                     <div className="pharmacy-card__actions">
-                      <Button
-                        as="a"
-                        href={`https://www.google.com/maps/dir/?api=1&destination=${pharmacy.lat},${pharmacy.lon}&destination_place_id=${pharmacy.place_id}`}
+                      <a
+                        href={`https://www.google.com/maps/dir/?api=1&destination=${pharmacy.lat},${pharmacy.lon}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        variant="primary"
-                        size="small"
-                        fullWidth
+                        style={{ textDecoration: 'none', width: '100%' }}
                       >
-                        🗺️ {t("pharmacy_get_directions") || "Get Directions"}
-                      </Button>
+                        <Button
+                          variant="primary"
+                          size="small"
+                          fullWidth
+                        >
+                          🗺️ {t("pharmacy_get_directions") || "Get Directions"}
+                        </Button>
+                      </a>
                     </div>
                   
                 </Card>

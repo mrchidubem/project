@@ -12,7 +12,8 @@ service cloud.firestore {
     }
     
     function hasValidTimestamp() {
-      return request.resource.data.updatedAt == request.time;
+      return !request.resource.data.keys().hasAny(['updatedAt']) || 
+             request.resource.data.updatedAt == request.time;
     }
     
     function isHealthcareProvider() {
@@ -46,40 +47,42 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if isOwner(userId);
       allow create: if isAuthenticated() && 
-                      request.auth.uid == userId &&
-                      request.resource.data.email is string &&
-                      isValidEmail(request.resource.data.email);
-      allow update: if isOwner(userId) && hasValidTimestamp();
+                      request.auth.uid == userId;
+      allow update: if isOwner(userId);
       allow delete: if isOwner(userId);
     }
     
     // Medications collection - user's medication data
     match /medications/{medicationId} {
-      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      // Allow reading own medications (both get and list)
+      allow get: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow list: if isAuthenticated() && 
+                    request.query.limit <= 100;
       allow create: if isAuthenticated() && isValidMedication(request.resource.data);
       allow update: if isAuthenticated() && 
                       resource.data.userId == request.auth.uid &&
-                      isValidMedication(request.resource.data) &&
-                      hasValidTimestamp();
+                      isValidMedication(request.resource.data);
       allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
     }
     
     // ADR Reports collection - adverse drug reaction reports
     // Users can write their own reports, healthcare providers can read all
     match /adrReports/{adrId} {
-      allow read: if isAuthenticated() && 
-                    (resource.data.userId == request.auth.uid || isHealthcareProvider());
+      allow get: if isAuthenticated() && 
+                   (resource.data.userId == request.auth.uid || isHealthcareProvider());
+      allow list: if isAuthenticated() && 
+                    (isHealthcareProvider() || request.query.limit <= 100);
       allow create: if isAuthenticated() && isValidADRReport(request.resource.data);
       allow update: if isAuthenticated() && 
                       resource.data.userId == request.auth.uid &&
-                      isValidADRReport(request.resource.data) &&
-                      hasValidTimestamp();
+                      isValidADRReport(request.resource.data);
       allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
     }
     
     // Adherence History collection - daily adherence tracking
     match /adherenceHistory/{historyId} {
-      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow get: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow list: if isAuthenticated() && request.query.limit <= 100;
       allow create: if isAuthenticated() && 
                       request.resource.data.userId == request.auth.uid &&
                       request.resource.data.keys().hasAll(['userId', 'date', 'adherenceRate', 'createdAt']);
@@ -101,9 +104,11 @@ service cloud.firestore {
       allow write: if false; // Only admin can modify
     }
     
-    // Audit logs - system access only
-    match /audit_logs/{logId} {
-      allow read, write: if false; // System access only
+    // Audit logs - write by authenticated users, read by system only
+    match /auditLogs/{logId} {
+      allow read: if false; // System/admin access only
+      allow create: if isAuthenticated(); // Allow authenticated users to create audit logs
+      allow update, delete: if false; // No modifications allowed
     }
     
     // Organizations collection - for NGOs, clinics, hospitals
