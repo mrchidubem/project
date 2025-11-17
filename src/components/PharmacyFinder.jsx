@@ -513,16 +513,29 @@ const PharmacyFinder = () => {
           <div className="pharmacy-list">
             {pharmacies.map((pharmacy, index) => {
               const pharmacyName = pharmacy.name || "Pharmacy";
-              // OpenStreetMap returns address in tags
-              const address = pharmacy.vicinity || 
-                             pharmacy.formatted_address || 
-                             (pharmacy.tags ? 
-                               [
-                                 pharmacy.tags["addr:housenumber"],
-                                 pharmacy.tags["addr:street"],
-                                 pharmacy.tags["addr:city"]
-                               ].filter(Boolean).join(", ") : null) ||
-                             "Address not available";
+              // Extract address from various possible sources
+              let address = "Address not available";
+              
+              if (pharmacy.vicinity) {
+                address = pharmacy.vicinity;
+              } else if (pharmacy.formatted_address) {
+                address = pharmacy.formatted_address;
+              } else if (pharmacy.address) {
+                address = pharmacy.address;
+              } else if (pharmacy.tags) {
+                const addressParts = [
+                  pharmacy.tags["addr:housenumber"],
+                  pharmacy.tags["addr:street"],
+                  pharmacy.tags["addr:city"],
+                  pharmacy.tags["addr:postcode"]
+                ].filter(Boolean);
+                if (addressParts.length > 0) {
+                  address = addressParts.join(", ");
+                }
+              } else if (pharmacy.lat && pharmacy.lon) {
+                // Fallback to coordinates if no address available
+                address = `${pharmacy.lat.toFixed(4)}, ${pharmacy.lon.toFixed(4)}`;
+              }
               
               const isOpenNow = pharmacy.opening_hours?.open_now;
               const rating = pharmacy.rating;

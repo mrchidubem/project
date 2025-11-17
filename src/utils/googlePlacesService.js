@@ -78,7 +78,7 @@ class GooglePlacesService {
           // Extract pharmacy information
           const tags = element.tags || {};
           const name = tags.name || tags.brand || "Pharmacy";
-          const address = this.formatAddress(tags);
+          const address = this.formatAddress(tags, lat, lon);
           const phone = tags.phone || tags["contact:phone"] || null;
           const website = tags.website || tags["contact:website"] || null;
           const openingHours = tags.opening_hours || null;
@@ -124,11 +124,14 @@ class GooglePlacesService {
   /**
    * Format address from OSM tags
    * @param {Object} tags - OSM tags
+   * @param {number} lat - Latitude
+   * @param {number} lon - Longitude
    * @returns {string} Formatted address
    */
-  formatAddress(tags) {
+  formatAddress(tags, lat, lon) {
     const parts = [];
     
+    // Try structured address first
     if (tags["addr:housenumber"]) parts.push(tags["addr:housenumber"]);
     if (tags["addr:street"]) parts.push(tags["addr:street"]);
     if (tags["addr:suburb"]) parts.push(tags["addr:suburb"]);
@@ -136,7 +139,21 @@ class GooglePlacesService {
     if (tags["addr:state"]) parts.push(tags["addr:state"]);
     if (tags["addr:postcode"]) parts.push(tags["addr:postcode"]);
     
-    return parts.length > 0 ? parts.join(", ") : "Address not available";
+    if (parts.length > 0) {
+      return parts.join(", ");
+    }
+    
+    // Fallback to other location indicators
+    if (tags["addr:place"]) return tags["addr:place"];
+    if (tags["addr:district"]) return tags["addr:district"];
+    if (tags["addr:province"]) return tags["addr:province"];
+    
+    // Last resort: show coordinates
+    if (lat && lon) {
+      return `Lat: ${lat.toFixed(4)}, Lon: ${lon.toFixed(4)}`;
+    }
+    
+    return "Address not available";
   }
 
   /**
