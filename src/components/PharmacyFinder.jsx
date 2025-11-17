@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { Button, Card, Input, Select, Alert, Badge, Skeleton, Spinner } from "./ui";
+import { Button, Card, Input, Alert, Badge, Skeleton } from "./ui";
 import locationService from "../utils/locationService";
 import googlePlacesService from "../utils/googlePlacesService";
 import pharmacyCache from "../utils/pharmacyCache";
@@ -365,18 +365,19 @@ const PharmacyFinder = () => {
             <label htmlFor="radius-selector" className="filter-bar__label">
               {t("search_radius") || "Search Radius"}:
             </label>
-            <Select
+            <select
               id="radius-selector"
               value={searchRadius}
               onChange={(e) => handleRadiusChange(parseInt(e.target.value, 10))}
               disabled={loading}
+              className="filter-bar__select"
             >
               {RADIUS_OPTIONS.map((radius) => (
                 <option key={radius} value={radius}>
                   {radius} km
                 </option>
               ))}
-            </Select>
+            </select>
           </div>
 
           <Button
