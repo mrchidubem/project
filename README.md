@@ -2,47 +2,31 @@
 
 <div align="center">
 
-![MedAdhere Logo](public/icon-192.png)
-
 **A Progressive Web App for tracking medication adherence, managing schedules, and reporting adverse drug reactions**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![React](https://img.shields.io/badge/React-18.3.1-blue.svg)](https://reactjs.org/)
-[![Firebase](https://img.shields.io/badge/Firebase-Latest-orange.svg)](https://firebase.google.com/)
+[![React](https://img.shields.io/badge/React-18.2-blue.svg)](https://reactjs.org/)
+[![Firebase](https://img.shields.io/badge/Firebase-9.23-orange.svg)](https://firebase.google.com/)
 [![PWA](https://img.shields.io/badge/PWA-Enabled-green.svg)](https://web.dev/progressive-web-apps/)
 
-[Features](#features) • [Demo](#demo) • [Installation](#installation) • [Documentation](#documentation) • [Contributing](#contributing)
+[Live Demo](https://medadhere-bab59.web.app) • [Features](#features) • [Installation](#installation) • [Documentation](#documentation)
 
 </div>
 
 ---
 
-## 📋 Table of Contents
-
-- [Overview](#overview)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Getting Started](#getting-started)
-- [Project Structure](#project-structure)
-- [Security](#security)
-- [Internationalization](#internationalization)
-- [Documentation](#documentation)
-- [Contributing](#contributing)
-- [License](#license)
-
----
-
 ## 🌟 Overview
 
-MedAdhere is a comprehensive medication adherence tracking application designed to help patients manage their medications effectively, even in offline environments. Built with healthcare compliance in mind, it features enterprise-grade security, multi-language support, and a beautiful, accessible user interface.
+MedAdhere is a comprehensive medication adherence tracking application designed to help patients manage their medications effectively. Built with healthcare compliance in mind, it features enterprise-grade security, multi-language support, and a beautiful, accessible user interface.
 
 ### Why MedAdhere?
 
-- **Offline-First**: Works without internet connectivity using Progressive Web App technology
-- **HIPAA-Ready**: Enterprise-grade security with audit logging and access controls
-- **Multi-Language**: Supports English, French, Swahili, Yoruba, Igbo, and Hausa
+- **Offline-First**: Works without internet using Progressive Web App technology
+- **Secure**: Enterprise-grade security with audit logging and access controls
+- **Multi-Language**: Supports 6 languages (EN, FR, SW, HA, IG, YO)
 - **Accessible**: WCAG 2.1 AA compliant with full keyboard navigation
 - **Privacy-Focused**: User data stays private with granular privacy controls
+- **Free Pharmacy Finder**: Uses OpenStreetMap - no API key required!
 
 ---
 
@@ -66,30 +50,35 @@ MedAdhere is a comprehensive medication adherence tracking application designed 
   - Daily adherence rate calculation
   - Visual progress indicators
   - Historical adherence data
-  - Streak tracking
+  - 7-day trend charts
 
-- **⚠️ Adverse Drug Reaction (ADR) Reporting**
+- **⚠️ ADR Reporting**
   - Report side effects and reactions
-  - Severity classification (mild, moderate, severe)
+  - Severity classification
   - Symptom documentation
   - Healthcare provider sharing
 
 ### Advanced Features
 
-- **📈 Analytics Dashboard** (Healthcare Providers)
+- **📈 Analytics Dashboard**
   - Adherence trends over time
   - Medication type distribution
   - ADR report analytics
   - Geographic distribution maps
 
-- **🔍 Pharmacy Finder** (OpenStreetMap - 100% Free!)
+- **🔍 Pharmacy Finder** (100% Free!)
   - GPS-based location detection
-  - Real-time pharmacy search
+  - Real-time pharmacy search (1-50km radius)
   - Distance calculation and sorting
-  - Contact information (phone, website)
-  - Operating hours
+  - Contact information and hours
   - Direct navigation links
-  - No API key required!
+  - **No API key required!**
+
+- **💳 Premium Subscription**
+  - Mock Stripe checkout (demo mode)
+  - Unlimited medications and ADR reports
+  - Test card: 4242 4242 4242 4242
+  - 1-month subscription tracking
 
 - **🌐 Offline Support**
   - Service Worker caching
@@ -99,7 +88,7 @@ MedAdhere is a comprehensive medication adherence tracking application designed 
 
 - **🔐 Privacy & Security**
   - Firebase Authentication
-  - End-to-end encryption ready
+  - Rate limiting protection
   - Granular privacy settings
   - Data export functionality
   - Account deletion
@@ -110,7 +99,7 @@ MedAdhere is a comprehensive medication adherence tracking application designed 
   - Wellness-themed design system
   - Smooth animations and transitions
   - Responsive layout (mobile-first)
-  - Dark mode support (coming soon)
+  - Interactive onboarding tutorial
 
 - **♿ Accessibility**
   - Screen reader support
@@ -121,7 +110,6 @@ MedAdhere is a comprehensive medication adherence tracking application designed 
 
 - **🌍 Internationalization**
   - 6 languages supported
-  - RTL support ready
   - Dynamic content translation
   - Language persistence
 
@@ -130,29 +118,25 @@ MedAdhere is a comprehensive medication adherence tracking application designed 
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **React 18.3.1** - UI library
-- **Vite** - Build tool and dev server
-- **React Router 6** - Client-side routing
+- **React 18.2** - UI library
+- **Vite 5.0** - Build tool
+- **React Router 7** - Client-side routing
 - **i18next** - Internationalization
-- **Chart.js** - Data visualization
+- **Recharts** - Data visualization
+- **Stripe.js** - Payment processing
 
 ### Backend & Services
 - **Firebase Authentication** - User management
 - **Cloud Firestore** - NoSQL database
 - **Firebase Hosting** - Static hosting
-- **Cloud Functions** - Serverless functions (ready)
+- **OpenStreetMap** - Free pharmacy location data
 
 ### Security
 - **DOMPurify** - XSS protection
 - **Content Security Policy** - Browser security
 - **Firestore Security Rules** - Database access control
 - **Rate Limiting** - Brute force protection
-- **Audit Logging** - HIPAA compliance
-
-### Development Tools
-- **ESLint** - Code linting
-- **Prettier** - Code formatting
-- **Workbox** - Service Worker management
+- **Audit Logging** - Compliance tracking
 
 ---
 
@@ -168,8 +152,8 @@ MedAdhere is a comprehensive medication adherence tracking application designed 
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/medadhere.git
-   cd medadhere
+   git clone https://github.com/Cedar-Creatives/MedAdhere.git
+   cd MedAdhere
    ```
 
 2. **Install dependencies**
@@ -179,7 +163,7 @@ MedAdhere is a comprehensive medication adherence tracking application designed 
 
 3. **Configure Firebase**
    
-   Create a `.env` file in the root directory:
+   Create a `.env` file:
    ```env
    VITE_FIREBASE_API_KEY=your_api_key
    VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
@@ -190,15 +174,11 @@ MedAdhere is a comprehensive medication adherence tracking application designed 
    ```
 
    See [FIREBASE_SETUP.md](FIREBASE_SETUP.md) for detailed instructions.
-   
-   **Note**: Pharmacy Finder uses free OpenStreetMap API - no additional setup needed!
 
 4. **Start development server**
    ```bash
    npm run dev
    ```
-
-   The app will be available at `http://localhost:5173`
 
 5. **Build for production**
    ```bash
@@ -207,7 +187,7 @@ MedAdhere is a comprehensive medication adherence tracking application designed 
 
 6. **Deploy to Firebase**
    ```bash
-   npm run deploy
+   firebase deploy --only hosting
    ```
 
 ---
@@ -217,92 +197,100 @@ MedAdhere is a comprehensive medication adherence tracking application designed 
 ```
 medadhere/
 ├── public/                 # Static assets
-│   ├── icon-192.png       # PWA icons
-│   ├── icon-512.png
-│   └── manifest.json      # PWA manifest
 ├── src/
 │   ├── components/        # React components
-│   │   ├── Auth/         # Authentication components
-│   │   ├── Navigation/   # Navigation components
-│   │   ├── analytics/    # Analytics charts
-│   │   └── ui/           # Reusable UI components
+│   │   ├── Auth/         # Authentication
+│   │   ├── Navigation/   # Navigation
+│   │   ├── analytics/    # Charts
+│   │   └── ui/           # UI components
 │   ├── pages/            # Page components
 │   ├── utils/            # Utility functions
-│   │   ├── authService.js
-│   │   ├── databaseService.js
-│   │   ├── securityUtils.js
-│   │   └── securityMiddleware.js
-│   ├── locales/          # Translation files
+│   ├── locales/          # Translations
 │   ├── styles/           # Global styles
-│   ├── hooks/            # Custom React hooks
-│   ├── config/           # Configuration files
-│   ├── App.jsx           # Main app component
-│   └── main.jsx          # Entry point
-├── firestore.rules       # Firestore security rules
-├── firebase.json         # Firebase configuration
-├── .env.example          # Environment variables template
-├── package.json          # Dependencies
-└── vite.config.mjs       # Vite configuration
+│   └── App.jsx           # Main app
+├── firestore.rules       # Security rules
+├── firebase.json         # Firebase config
+└── package.json          # Dependencies
 ```
 
 ---
 
 ## 🔐 Security
 
-MedAdhere implements enterprise-grade security measures:
-
-### Security Features
-
-- **Input Validation & Sanitization**
-  - DOMPurify for XSS protection
-  - Regex-based validation
-  - Server-side validation in Firestore rules
-
-- **Authentication Security**
-  - Rate limiting (5 login attempts per 15 minutes)
-  - Password complexity requirements
-  - Account lockout protection
-  - Secure session management
-
-- **Data Protection**
-  - Firestore security rules with granular access control
-  - Audit logging for all security events
-  - HTTPS/TLS encryption
-  - Content Security Policy headers
-
-- **HIPAA Compliance Ready**
-  - Audit trail for PHI access
-  - Access controls and authentication
-  - Data encryption in transit and at rest
-  - Privacy settings and consent management
-
-See [SECURITY_HARDENING_SUMMARY.md](SECURITY_HARDENING_SUMMARY.md) for complete security documentation.
+- **Input Validation** - DOMPurify for XSS protection
+- **Authentication Security** - Rate limiting (5 attempts/15min)
+- **Data Protection** - Firestore security rules
+- **HIPAA Ready** - Audit logging and access controls
 
 ---
 
-## 🌍 Internationalization
+## 🌍 Languages
 
-MedAdhere supports 6 languages out of the box:
-
-- 🇬🇧 English (en)
-- 🇫🇷 French (fr)
-- 🇹🇿 Swahili (sw)
-- 🇳🇬 Yoruba (yo)
-- 🇳🇬 Igbo (ig)
-- 🇳🇬 Hausa (ha)
-
-### Adding a New Language
-
-1. Create a new translation file in `src/locales/[language-code].json`
-2. Copy the structure from `src/locales/en.json`
-3. Translate all keys
-4. Add the language to `src/i18n.js`
-5. Update the language switcher in `src/components/LanguageSwitcher.jsx`
+- 🇬🇧 English
+- 🇫🇷 French
+- 🇹🇿 Swahili
+- 🇳🇬 Yoruba
+- 🇳🇬 Igbo
+- 🇳🇬 Hausa
 
 ---
 
-## 🧑‍💻 Installation (For Developers)
+## 🧪 Testing
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/<your-username>/medadherence.git
+### Test Premium Upgrade
+1. Visit app and login
+2. Click "Upgrade to Premium"
+3. Use test card: **4242 4242 4242 4242**
+4. Expiry: 12/25, CVC: 123
+5. Verify premium status
+
+### Test Pharmacy Finder
+1. Navigate to Pharmacy Finder
+2. Select radius (1-50km)
+3. Allow location access
+4. View results with addresses
+
+---
+
+## 📚 Documentation
+
+- [Firebase Setup Guide](FIREBASE_SETUP.md)
+- [Quick Start Guide](QUICK_START.md)
+- [Mock Payment Guide](MOCK_PAYMENT_GUIDE.md)
+- [Stripe Integration](STRIPE_INTEGRATION_SUMMARY.md)
+- [Final Deployment Summary](FINAL_DEPLOYMENT_SUMMARY.md)
+- [Changelog](CHANGELOG.md)
+- [Contributing Guidelines](CONTRIBUTING.md)
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see [LICENSE](LICENSE) file.
+
+---
+
+## 🙏 Acknowledgments
+
+- Firebase for backend infrastructure
+- OpenStreetMap for free pharmacy data
+- React community for excellent tools
+- All contributors and testers
+
+---
+
+## 📞 Support
+
+For support, email support@medadhere.com or open an issue.
+
+---
+
+**Built with ❤️ by Cedar Creatives**
+
+**Live Demo**: https://medadhere-bab59.web.app
