@@ -31,15 +31,15 @@ This project represents the capstone deliverable for the **Artificial Intelligen
 - **Privacy-Centric Design**: User-controlled data management with granular privacy settings and full data export capabilities
 - **Zero-Cost Pharmacy Integration**: OpenStreetMap-based pharmacy finder requiring no API keys or external service costs
 
-## Development Team
+## Developer
 
 <table align="center">
   <tr>
     <td align="center" width="50%">
-      <a href="https://github.com/VeeCC-T">
-        <img src="https://github.com/VeeCC-T.png" width="100px;" alt="VeeCC-T"/>
+      <a href="https://github.com/mrchidubem">
+        <img src="" width="100px;" alt="VeeCC-T"/>
         <br />
-        <sub><b>VeeCC-T</b></sub>
+        <sub><b>mrchidubem</b></sub>
       </a>
       <br />
       <sub>Lead Developer & Project Architect</sub>
@@ -74,7 +74,7 @@ This project represents the capstone deliverable for the **Artificial Intelligen
 
 <div align="center">
 
-**Repository**: [github.com/VeeCC-T/MedAdhere](https://github.com/VeeCC-T/MedAdhere)
+**Repository**: [https://github.com/mrchidubem/project](https://github.com/mrchidubem)
 
 </div>
 
@@ -338,17 +338,17 @@ This project was made possible through the support and resources provided by:
 ## Support
 
 For technical support, bug reports, or feature requests:
-- Submit an issue via [GitHub Issues](https://github.com/VeeCC-T/MedAdhere/issues)
-- Contact the development team: [VeeCC-T](https://github.com/VeeCC-T) or [Cedar-Creatives](https://github.com/Cedar-Creatives)
+)
+- Contact the development team:  [Chidubem Okafor](https://github.com/mrchidubem/project)
 
 ## Citation
 
 For academic or research use, please cite this project as:
 
 ```
-VeeCC-T & Cedar-Creatives. (2025). MedAdhere: Medication Adherence Tracking Platform. 
+Joseph Okafor. (2025). MedAdhere: Medication Adherence Tracking Platform. 
 Power Learn Project Africa - Artificial Intelligence in Software Engineering Certificate Capstone Project.
-https://github.com/VeeCC-T/MedAdhere
+(https://github.com/mrchidubem/project/)
 ```
 
 ---
@@ -358,6 +358,6 @@ https://github.com/VeeCC-T/MedAdhere
 **Live Application**: https://medadhere-bab59.web.app  
 **Source Repository**: https://github.com/VeeCC-T/MedAdhere
 
-Developed by [VeeCC-T](https://github.com/VeeCC-T) and [Cedar-Creatives](https://github.com/Cedar-Creatives)
+Developed by [Joseph Okafor](https://github.com/mrchidubem/project/)
 
 </div>
